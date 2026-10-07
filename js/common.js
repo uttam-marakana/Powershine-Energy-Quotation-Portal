@@ -504,29 +504,29 @@ function drawQuotationPage(pdfDoc, data) {
   // FROM — company information
   // ---------------------------------------------------------------
   pdfText(pdfDoc, page, 'From', 34, infoTop - 8, {
-    size: 9,
+    size: 10,
     bold: true,
     color: orange
   });
   pdfText(pdfDoc, page, data.companyName || 'POWERSHINE ENERGY', 34, infoTop - 23, {
-    size: 9,
+    size: 10,
     bold: true,
     color: darkOrange,
     maxWidth: 155,
-    lineHeight: 11
+    lineHeight: 12
   });
   pdfText(pdfDoc, page, data.companyAddress || 'PowerShine Energy', 34, infoTop - 48, {
-    size: 7.6,
+    size: 8.4,
     color: dark,
     maxWidth: 155,
-    lineHeight: 9.5
+    lineHeight: 10.5
   });
 
   // ---------------------------------------------------------------
   // BILL TO — dealer form data; GST intentionally omitted
   // ---------------------------------------------------------------
   pdfText(pdfDoc, page, 'Bill To', 220, infoTop - 8, {
-    size: 9,
+    size: 10,
     bold: true,
     color: orange
   });
@@ -534,31 +534,31 @@ function drawQuotationPage(pdfDoc, data) {
   let billY = infoTop - 25;
   if (data.customerBusinessName) {
     billY = pdfText(pdfDoc, page, data.customerBusinessName, 220, billY, {
-      size: 8.8,
+      size: 9.4,
       bold: true,
       color: dark,
       maxWidth: 140,
-      lineHeight: 10
+      lineHeight: 11
     }) - 13;
   }
 
   billY = pdfText(pdfDoc, page, data.customerName || '—', 220, billY, {
-    size: 8.8,
+    size: 9.4,
     bold: true,
+    color: dark,
+    maxWidth: 140,
+    lineHeight: 11
+  }) - 13;
+
+  billY = pdfText(pdfDoc, page, data.customerAddress || data.city || '—', 220, billY, {
+    size: 8.2,
     color: dark,
     maxWidth: 140,
     lineHeight: 10
   }) - 13;
 
-  billY = pdfText(pdfDoc, page, data.customerAddress || data.city || '—', 220, billY, {
-    size: 7.6,
-    color: dark,
-    maxWidth: 140,
-    lineHeight: 9.5
-  }) - 13;
-
   pdfText(pdfDoc, page, `Mobile : ${data.mobile || data.contactNo || '—'}`, 220, billY, {
-    size: 7.6,
+    size: 8.2,
     color: dark,
     maxWidth: 140
   });
@@ -568,7 +568,7 @@ function drawQuotationPage(pdfDoc, data) {
   // customer name + customer/contact number. Partner code is entered manually by the dealer.
   // ---------------------------------------------------------------
   const metaX = 390;
-  const metaValueX = 455;
+  const metaValueX = 468;
   const meta = [
     ['Date:', formatDateForPdf(data.date)],
     ['Expiry Date:', data.expiryDate ? formatDateForPdf(data.expiryDate) : '—'],
@@ -581,15 +581,18 @@ function drawQuotationPage(pdfDoc, data) {
   meta.forEach(([label, value], index) => {
     const y = infoTop - 8 - index * 18;
     pdfText(pdfDoc, page, label, metaX, y, {
-      size: 7.2,
+      size: 7.8,
       bold: true,
       color: orange
     });
-    pdfText(pdfDoc, page, String(value || '—'), metaValueX, y, {
-      size: 7.2,
+    pdfColumnText(pdfDoc, page, String(value || '—'), {
+      left: metaValueX,
+      right: width - 34
+    }, y, {
+      size: 7.8,
+      minSize: 6.4,
       color: dark,
-      maxWidth: 105,
-      lineHeight: 8.5
+      align: 'left'
     });
   });
 
@@ -635,23 +638,23 @@ function drawQuotationPage(pdfDoc, data) {
 
   const headerY = tableY + 7;
   pdfText(pdfDoc, page, '#', cols.no, headerY, {
-    size: 7.2, bold: true, color: white
+    size: 7.8, bold: true, color: white
   });
   pdfText(pdfDoc, page, 'Item & Description', cols.desc, headerY, {
-    size: 7.2, bold: true, color: white
+    size: 7.8, bold: true, color: white
   });
 
   pdfColumnText(pdfDoc, page, 'Qty', cols.qty, headerY, {
-    size: 7.2, bold: true, color: white, align: 'center'
+    size: 7.8, bold: true, color: white, align: 'center'
   });
   pdfColumnText(pdfDoc, page, 'Rate', cols.rate, headerY, {
-    size: 7.2, bold: true, color: white, align: 'right'
+    size: 7.8, bold: true, color: white, align: 'right'
   });
   pdfColumnText(pdfDoc, page, 'Discount', cols.discount, headerY, {
-    size: 7.2, bold: true, color: white, align: 'right'
+    size: 7.8, bold: true, color: white, align: 'right'
   });
   pdfColumnText(pdfDoc, page, 'Total', cols.total, headerY, {
-    size: 7.2, bold: true, color: white, align: 'right'
+    size: 7.8, bold: true, color: white, align: 'right'
   });
 
   let currentY = tableY;
@@ -671,12 +674,12 @@ function drawQuotationPage(pdfDoc, data) {
     });
 
     pdfText(pdfDoc, page, String(index + 1), cols.no, currentY + rowHeight - 17, {
-      size: 7.5,
+      size: 8.0,
       color: dark
     });
 
     pdfText(pdfDoc, page, row.description || '—', cols.desc, currentY + rowHeight - 16, {
-      size: 7.8,
+      size: 8.4,
       bold: true,
       color: dark,
       maxWidth: cols.descMaxWidth,
@@ -684,7 +687,7 @@ function drawQuotationPage(pdfDoc, data) {
     });
 
     pdfText(pdfDoc, page, row.detail || '', cols.desc, currentY + rowHeight - 31, {
-      size: 6.7,
+      size: 7.2,
       color: muted,
       maxWidth: cols.descMaxWidth,
       lineHeight: 8
@@ -693,25 +696,25 @@ function drawQuotationPage(pdfDoc, data) {
     const cellY = currentY + rowHeight - 16;
 
     pdfColumnText(pdfDoc, page, String(row.qty || '1'), cols.qty, cellY, {
-      size: 7.2,
+      size: 7.8,
       color: dark,
       align: 'center'
     });
 
     pdfColumnText(pdfDoc, page, row.rate || '₹ 0', cols.rate, cellY, {
-      size: 7.2,
+      size: 7.8,
       color: dark,
       align: 'right'
     });
 
     pdfColumnText(pdfDoc, page, row.discount || '0 %', cols.discount, cellY, {
-      size: 7.2,
+      size: 7.8,
       color: dark,
       align: 'right'
     });
 
     pdfColumnText(pdfDoc, page, row.total || '₹ 0', cols.total, cellY, {
-      size: 7.5,
+      size: 8.0,
       bold: true,
       color: dark,
       align: 'right'
@@ -735,7 +738,7 @@ function drawQuotationPage(pdfDoc, data) {
   });
 
   pdfText(pdfDoc, page, data.amountInWords || '', 40, summaryTop - 22, {
-    size: 7.2,
+    size: 8.0,
     color: dark,
     maxWidth: 300,
     lineHeight: 10
@@ -743,7 +746,7 @@ function drawQuotationPage(pdfDoc, data) {
 
   if (data.note) {
     pdfText(pdfDoc, page, `Note: ${data.note}`, 40, summaryTop - 50, {
-      size: 6.8,
+      size: 7.4,
       color: muted,
       maxWidth: 300,
       lineHeight: 8
@@ -760,12 +763,12 @@ function drawQuotationPage(pdfDoc, data) {
   summaryRows.forEach(([label, value], index) => {
     const y = summaryTop - 20 - index * 25;
     pdfText(pdfDoc, page, label, summaryX, y, {
-      size: 7.8,
+      size: 8.4,
       bold: index === summaryRows.length - 1,
       color: dark
     });
     pdfRightText(pdfDoc, page, value, width - 32, y, {
-      size: 7.8,
+      size: 8.4,
       bold: index === summaryRows.length - 1,
       color: dark
     });
@@ -784,9 +787,9 @@ function addBankDetailSpacing(pdfDoc) {
   // right edge, preventing any leftover characters from the template from
   // showing through into the signature column.
   page.drawRectangle({
-    x: 238,
+    x: 200,
     y: height - 202,
-    width: 198,
+    width: 173,
     height: 94,
     color: white
   });
@@ -803,11 +806,11 @@ function addBankDetailSpacing(pdfDoc) {
   // create the requested visual gap while remaining inside the bank column.
   let y = height - 130;
   lines.forEach((line) => {
-    pdfText(pdfDoc, page, line, 242, y, {
-      size: 9.1,
+    pdfText(pdfDoc, page, line, 204, y, {
+      size: 8.6,
       color: dark,
-      maxWidth: 190,
-      lineHeight: 11
+      maxWidth: 164,
+      lineHeight: 10.5
     });
     y -= 13;
   });
@@ -848,12 +851,92 @@ function amountInWordsINR(amount) {
   return `Indian Rupee ${parts.join(' ')} Only`;
 }
 
+
+function drawThankYouPageUpdates(pdfDoc) {
+  const page = pdfDoc.getPage(5);
+  const { height } = page.getSize();
+  const white = PDFLib.rgb(1, 1, 1);
+  const orange = [0.91, 0.40, 0.00];
+  const dark = [0.08, 0.08, 0.08];
+
+  // Refresh the two requested contact blocks on the final Thank You page.
+  // The middle contact-row mobile value is used for Communication, while the
+  // first PowerShine contact-row value is used for Corporate Office.
+  page.drawRectangle({
+    x: 207,
+    y: 447,
+    width: 145,
+    height: 68,
+    color: white
+  });
+  page.drawRectangle({
+    x: 374,
+    y: 447,
+    width: 177,
+    height: 68,
+    color: white
+  });
+
+  pdfText(pdfDoc, page, ':: COMMUNICATION ::', 211, 506, {
+    size: 7.8,
+    bold: true,
+    color: orange
+  });
+  pdfText(pdfDoc, page, 'MOBILE : 7046769467', 211, 494, {
+    size: 7.5,
+    bold: true,
+    color: dark
+  });
+  pdfText(pdfDoc, page, 'EMAIL : info@powershineenergy.com', 211, 482, {
+    size: 7.2,
+    color: dark,
+    maxWidth: 136,
+    lineHeight: 8.5
+  });
+  pdfText(pdfDoc, page, 'WEB : powershineenergy.com', 211, 469, {
+    size: 7.2,
+    color: dark,
+    maxWidth: 136,
+    lineHeight: 8.5
+  });
+
+  pdfText(pdfDoc, page, ':: CORPORATE OFFICE ::', 378, 506, {
+    size: 7.8,
+    bold: true,
+    color: orange
+  });
+  pdfText(pdfDoc, page, 'Powershine Energy', 378, 494, {
+    size: 7.5,
+    bold: true,
+    color: dark
+  });
+  pdfText(pdfDoc, page,
+    'A-502, 9 Square Decora, Nana Mauva Road, Near Marwadi Building,',
+    378, 482, {
+      size: 6.8,
+      color: dark,
+      maxWidth: 164,
+      lineHeight: 8
+    }
+  );
+  pdfText(pdfDoc, page,
+    'Nana Mauva Circle, Rajkot - 360001, Gujarat - 360004',
+    378, 466, {
+      size: 6.8,
+      color: dark,
+      maxWidth: 164,
+      lineHeight: 8
+    }
+  );
+}
+
 async function buildTemplateQuotation(data) {
   const pdfDoc = await createTemplatePdf();
 
   drawCoverPage(pdfDoc, data);
   drawQuotationPage(pdfDoc, data);
   addBankDetailSpacing(pdfDoc);
+  drawThankYouPageUpdates(pdfDoc);
 
   return pdfDoc;
 }
