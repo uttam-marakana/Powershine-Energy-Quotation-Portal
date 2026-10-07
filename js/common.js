@@ -69,13 +69,10 @@ function sanitizeFileName(value) {
 }
 
 function syncQuotationCreator() {
-  const nameInput = document.getElementById('name');
-  const mobileInput = document.getElementById('mobile') || document.getElementById('contactNo');
-  const nameOutput = document.getElementById('creatorDisplayName');
-  const mobileOutput = document.getElementById('creatorDisplayMobile');
-
-  if (nameOutput) nameOutput.value = nameInput?.value.trim() || '';
-  if (mobileOutput) mobileOutput.value = mobileInput?.value.trim() || '';
+  // Quotation creator details are intentionally manual fields.
+  // Keep this function for backwards-compatible page reset handlers, but do not
+  // copy customer details into the creator fields.
+  return true;
 }
 
 function createQuotationId(prefix = 'PSE') {
@@ -578,7 +575,7 @@ function drawQuotationPage(pdfDoc, data) {
     ['Estimate#:', data.quotationId],
     ['Created by:', data.createdBy || '—'],
     ['Contact:', data.creatorMobile || '—'],
-    ['Partner Code:', data.channelPartnerCode || '—']
+    ['Channel Partner Code:', data.channelPartnerCode || '—']
   ];
 
   meta.forEach(([label, value], index) => {
@@ -725,7 +722,7 @@ function drawQuotationPage(pdfDoc, data) {
   // SUMMARY — placed after the dynamically sized rows.
   // ---------------------------------------------------------------
   const summaryTop = currentY - 8;
-  const summaryH = 82;
+  const summaryH = 100;
 
   page.drawRectangle({
     x: tableX,
@@ -756,11 +753,12 @@ function drawQuotationPage(pdfDoc, data) {
   const summaryX = 405;
   const summaryRows = [
     ['Sub Total:', data.subTotal || '₹ 0'],
+    ['Subsidy (Reference):', data.subsidy || '₹ 0'],
     ['Total:', data.grandTotal || '₹ 0']
   ];
 
   summaryRows.forEach(([label, value], index) => {
-    const y = summaryTop - 22 - index * 28;
+    const y = summaryTop - 20 - index * 25;
     pdfText(pdfDoc, page, label, summaryX, y, {
       size: 7.8,
       bold: index === summaryRows.length - 1,

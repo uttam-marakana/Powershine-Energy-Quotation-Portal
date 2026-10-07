@@ -144,17 +144,17 @@
 
           <div class="creator-auto-grid">
             <div class="form-group">
-              <label>Quotation Creator Name</label>
-              <input type="text" class="form-control creator-auto-field" id="creatorDisplayName" placeholder="Auto from customer name" readonly>
+              <label>Quotation Creator Name <span class="req">*</span></label>
+              <input type="text" class="form-control" id="creatorDisplayName" placeholder="Enter quotation creator name" required>
             </div>
 
             <div class="form-group">
-              <label>Quotation Creator Mobile</label>
-              <input type="tel" class="form-control creator-auto-field" id="creatorDisplayMobile" placeholder="Auto from customer mobile" readonly>
+              <label>Quotation Creator Mobile <span class="req">*</span></label>
+              <input type="tel" class="form-control" id="creatorDisplayMobile" placeholder="Enter quotation creator mobile" inputmode="numeric" pattern="[0-9+()\- ]{10,15}" required>
             </div>
 
             <div class="form-group creator-code-group">
-              <label for="channelPartnerCode">Customer Code</label>
+              <label for="channelPartnerCode">Channel Partner Code</label>
               <input type="text" class="form-control" id="channelPartnerCode" value="CP-" placeholder="CP-001" autocomplete="off">
             </div>
           </div>

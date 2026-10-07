@@ -15,7 +15,6 @@
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>
-        <a href="commercial.html" target="_blank">Commercial</a>
       </nav>
     </div>
   </header>
@@ -139,17 +138,6 @@
             <input type="number" class="form-control" id="discomCharge" min="0" value="0" placeholder="Type 0 if No DISCOM Charge" required oninput="calcResidential()">
           </div>
 
-          <div class="form-group">
-            <label>Agreement Charge <span class="req">*</span></label>
-            <div class="radio-group">
-              <div class="radio-item"><input type="radio" name="agreement" value="350" checked onchange="calcResidential()"><label>₹ 350</label></div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Other Charge (if applicable, else 0)</label>
-            <input type="number" class="form-control" id="otherCharge" min="0" value="0" oninput="calcResidential()">
-          </div>
 
           <!-- Calculated Summary -->
           <div class="calc-box" id="calcSummary">
@@ -158,8 +146,6 @@
             <div class="calc-row"><span>Grand Total</span><span id="sumGrand">—</span></div>
             <div class="calc-row"><span>Subsidy</span><span id="sumSubsidy">—</span></div>
             <div class="calc-row"><span>DISCOM Charge</span><span id="sumDiscom">—</span></div>
-            <div class="calc-row"><span>Agreement Charge</span><span id="sumAgree">—</span></div>
-            <div class="calc-row"><span>Other Charges</span><span id="sumOther">—</span></div>
             <div class="calc-row total"><span>Customer Payable</span><span id="sumPayable">—</span></div>
           </div>
 
@@ -168,17 +154,17 @@
 
           <div class="creator-auto-grid">
             <div class="form-group">
-              <label>Quotation Creator Name</label>
-              <input type="text" class="form-control creator-auto-field" id="creatorDisplayName" placeholder="Auto from customer name" readonly>
+              <label>Quotation Creator Name <span class="req">*</span></label>
+              <input type="text" class="form-control" id="creatorDisplayName" placeholder="Enter quotation creator name" required>
             </div>
 
             <div class="form-group">
-              <label>Quotation Creator Mobile</label>
-              <input type="tel" class="form-control creator-auto-field" id="creatorDisplayMobile" placeholder="Auto from customer mobile" readonly>
+              <label>Quotation Creator Mobile <span class="req">*</span></label>
+              <input type="tel" class="form-control" id="creatorDisplayMobile" placeholder="Enter quotation creator mobile" inputmode="numeric" pattern="[0-9+()\- ]{10,15}" required>
             </div>
 
             <div class="form-group creator-code-group">
-              <label for="channelPartnerCode">Customer Code</label>
+              <label for="channelPartnerCode">Channel Partner Code</label>
               <input type="text" class="form-control" id="channelPartnerCode" value="CP-" placeholder="CP-001" autocomplete="off">
             </div>
           </div>

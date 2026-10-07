@@ -1,4 +1,4 @@
-# PowerShine Energy Dealer Quotation Portal
+# PowerShine Energy Quotation Portal — v22
 
 A lightweight static quotation portal for PowerShine Energy dealers. It supports separate Residential and Commercial quotation forms, a shared quotation data model, a supplied 6-page PDF template, in-browser PDF generation, final PDF preview, and download.
 
@@ -141,13 +141,18 @@ The supplied quotation template keeps the existing PowerShine Energy layout, but
 - Commercial cover pages use the entered customer name and available location/address because the commercial form does not currently contain a separate city field.
 - The lower orange cover information block uses one shared left edge for company, ID, date, creator, and plant-capacity values.
 
-## Latest quotation-generation updates (v21)
+## Latest quotation-generation updates (v22)
 
-- Quotation page uses adaptive row heights so long form details do not overlap, overflow into the next row, or hide behind the summary/footer.
-- Quotation creator name and mobile are automatically taken from the form's customer name and mobile/contact fields.
-- Channel Partner Code is automatically assigned sequentially as `CP-1`, `CP-2`, `CP-3`, etc. and remains stable while repeatedly previewing the same form.
-- The Channel Partner Code field is read-only and generated on the first PDF generation.
-- Page 5 preserves the original Notes / Bank Detail / Signature layout, with a controlled spacing adjustment before the bank-detail body so all bank text stays inside the bank column and never overlaps the signature area.
+- Quotation creator name is manually entered and required.
+- Quotation creator mobile is manually entered and required.
+- Creator values are used in the generated PDF and are no longer copied from customer details.
+- Customer Code has been renamed to Channel Partner Code; the field remains manual with a `CP-` default.
+- Residential subsidy is shown for reference only and is not deducted from customer payable.
+- Residential customer payable is the quotation amount plus the entered DISCOM charge.
+- Residential Agreement Charge and Other Charge fields have been removed.
+- The residential PDF quotation row and summary follow the same subsidy/payable rule.
+- Commercial is temporarily hidden from the main header navigation and home-page card grid, while `commercial.html` remains available directly.
+- Existing Qty / Rate / Discount / Total spacing and direct PDF preview behavior are retained.
 
 ## PDF Preview Performance
 
@@ -158,10 +163,13 @@ The PDF preview now caches the large quotation template and footer in memory and
 The Residential and Commercial quotation forms include responsive layouts for desktop, tablet, and mobile devices. Form controls use mobile-friendly sizing, wrapped radio options, stacked action buttons, responsive navigation, and overflow-safe quotation summary fields.
 
 
-## Final v21 updates
+## Final v21 baseline behavior retained
 
 - PDF preview opens immediately without a skeleton/loading screen.
 - The optimized base template is shown immediately while the data-filled quotation is generated.
 - Quotation table numeric columns use fixed boundaries and fitted text so Qty, Rate, Discount, and Total cannot overlap.
 - Qty is centered in its own column; Rate, Discount, and Total use dedicated right-aligned columns with spacing between each boundary.
-- Customer Code is manual and starts with `CP-`; no automatic code generation is used.
+
+## Current v22 updates
+
+See `docs/V22-CHANGES.md` for the latest changes.

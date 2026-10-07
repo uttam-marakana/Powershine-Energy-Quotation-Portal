@@ -49,8 +49,8 @@ function buildCommercialQuotationData() {
     contactNo: document.getElementById('contactNo').value.trim(),
     coverLocation: address,
 
-    createdBy: customerName,
-    creatorMobile: document.getElementById('contactNo').value.trim(),
+    createdBy: document.getElementById('creatorDisplayName').value.trim(),
+    creatorMobile: document.getElementById('creatorDisplayMobile').value.trim(),
     channelPartnerCode: document.getElementById('channelPartnerCode')?.value.trim() || '',
 
     capacity: plantSize || (calc.invKW ? `${calc.invKW.toFixed(2)} kW` : '—'),
@@ -91,6 +91,7 @@ function buildCommercialQuotationData() {
     ],
 
     subTotal: formatINR(calc.total),
+    subsidy: formatINR(0),
     tax: formatINR(0),
     grandTotal: formatINR(calc.total),
     amountInWords: amountInWordsINR(calc.total),
@@ -113,9 +114,5 @@ async function generatePDF() {
 
 document.addEventListener('DOMContentLoaded', () => {
   syncQuotationCreator();
-  const creatorSourceName = document.getElementById('name');
-  const creatorSourceMobile = document.getElementById('mobile') || document.getElementById('contactNo');
-  creatorSourceName?.addEventListener('input', syncQuotationCreator);
-  creatorSourceMobile?.addEventListener('input', syncQuotationCreator);
   calcCommercial();
 });

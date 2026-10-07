@@ -103,17 +103,15 @@ function calcResidential() {
     : parseFloat(subsidyValue) || 0;
 
   const discom = parseFloat(document.getElementById('discomCharge').value) || 0;
-  const agree = parseFloat(getRadioValue('agreement')) || 0;
-  const other = parseFloat(document.getElementById('otherCharge').value) || 0;
-  const payable = Math.max(0, grand - subsidy + discom + agree + other);
+  // Subsidy is shown for reference only. The customer payable amount is the
+  // quotation amount plus any entered DISCOM charge; subsidy is credited later.
+  const payable = Math.max(0, grand + discom);
 
   document.getElementById('totalKW').value = totalKW ? totalKW.toFixed(2) : '';
   document.getElementById('sumKW').textContent = totalKW ? `${totalKW.toFixed(2)} kW` : '—';
   document.getElementById('sumGrand').textContent = formatINR(grand);
   document.getElementById('sumSubsidy').textContent = formatINR(subsidy);
   document.getElementById('sumDiscom').textContent = formatINR(discom);
-  document.getElementById('sumAgree').textContent = formatINR(agree);
-  document.getElementById('sumOther').textContent = formatINR(other);
   document.getElementById('sumPayable').textContent = formatINR(payable);
 
   return {
@@ -123,8 +121,6 @@ function calcResidential() {
     grand,
     subsidy,
     discom,
-    agree,
-    other,
     payable
   };
 }
@@ -154,8 +150,8 @@ function buildResidentialQuotationData() {
     contactNo: document.getElementById('mobile').value.trim(),
     coverLocation: city,
 
-    createdBy: customerName,
-    creatorMobile: document.getElementById('mobile').value.trim(),
+    createdBy: document.getElementById('creatorDisplayName').value.trim(),
+    creatorMobile: document.getElementById('creatorDisplayMobile').value.trim(),
     channelPartnerCode: document.getElementById('channelPartnerCode')?.value.trim() || '',
 
     capacity: calc.totalKW ? `${calc.totalKW.toFixed(2)} kW` : '—',
@@ -179,7 +175,7 @@ function buildResidentialQuotationData() {
         rate: calc.totalKW
           ? formatINR(calc.grand / calc.totalKW)
           : formatINR(calc.grand),
-        total: formatINR(Math.max(0, calc.grand - calc.subsidy))
+        total: formatINR(calc.grand)
       },
       {
         description: 'DISCOM charge',
@@ -187,21 +183,15 @@ function buildResidentialQuotationData() {
         qty: '1',
         rate: formatINR(calc.discom),
         total: formatINR(calc.discom)
-      },
-      {
-        description: 'Agreement & other charges',
-        detail: `Agreement: ${formatINR(calc.agree)}\nOther: ${formatINR(calc.other)}`,
-        qty: '1',
-        rate: formatINR(calc.agree + calc.other),
-        total: formatINR(calc.agree + calc.other)
       }
     ],
 
     subTotal: formatINR(calc.payable),
+    subsidy: formatINR(calc.subsidy),
     tax: formatINR(0),
     grandTotal: formatINR(calc.payable),
     amountInWords: amountInWordsINR(calc.payable),
-    note: 'Residential quotation: customer payable amount is calculated after subsidy and applicable charges.'
+    note: 'Residential quotation: subsidy is shown for reference and is credited to the customer account later. Customer payable is quotation amount plus applicable DISCOM charge.'
   };
 }
 
@@ -221,10 +211,6 @@ async function generatePDF() {
 document.addEventListener('DOMContentLoaded', () => {
   syncQuotationCreator();
 
-  const creatorSourceName = document.getElementById('name');
-  const creatorSourceMobile = document.getElementById('mobile') || document.getElementById('contactNo');
-  creatorSourceName?.addEventListener('input', syncQuotationCreator);
-  creatorSourceMobile?.addEventListener('input', syncQuotationCreator);
   calcResidential();
 
   const panelCount = document.getElementById('noOfPanel');
