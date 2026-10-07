@@ -1,3 +1,6 @@
+
+// Panel wattage is intentionally the only dependent dropdown.
+// Panel Brand and Panel Type remain radio-button fields.
 const PANEL_WATT_RANGES = {
   Aps: {
     Bifacial: { min: 550, max: 550 },

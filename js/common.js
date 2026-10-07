@@ -792,6 +792,41 @@ function drawQuotationPage(pdfDoc, data) {
   });
 }
 
+function amountInWordsINR(amount) {
+  const n = Math.round(Number(amount) || 0);
+  if (n === 0) return 'Indian Rupee Zero Only';
+
+  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+  const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+  function twoDigits(value) {
+    if (value < 10) return ones[value];
+    if (value < 20) return teens[value - 10];
+    return `${tens[Math.floor(value / 10)]}${value % 10 ? ` ${ones[value % 10]}` : ''}`;
+  }
+
+  function threeDigits(value) {
+    if (value < 100) return twoDigits(value);
+    const remainder = value % 100;
+    return `${ones[Math.floor(value / 100)]} Hundred${remainder ? ` ${twoDigits(remainder)}` : ''}`;
+  }
+
+  const parts = [];
+  const crore = Math.floor(n / 10000000);
+  const lakh = Math.floor((n % 10000000) / 100000);
+  const thousand = Math.floor((n % 100000) / 1000);
+  const rest = n % 1000;
+
+  if (crore) parts.push(`${threeDigits(crore)} Crore`);
+  if (lakh) parts.push(`${threeDigits(lakh)} Lakh`);
+  if (thousand) parts.push(`${threeDigits(thousand)} Thousand`);
+  if (rest) parts.push(threeDigits(rest));
+
+  return `Indian Rupee ${parts.join(' ')} Only`;
+}
+
+
 async function buildTemplateQuotation(data) {
   const pdfDoc = await createTemplatePdf();
 

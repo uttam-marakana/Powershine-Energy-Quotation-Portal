@@ -183,4 +183,4 @@ Inverter Brand: Rem, Aps, Polycab, Solaryaan
 
 ## Latest Version
 
-**V28** — Restores the approved PDF Page 5 Bank Details and Page 6 Thank You layouts exactly from the supplied quotation template.
+**V29** — Fixes browser form-validation regex compatibility and restores the shared amount-in-words PDF utility while preserving the approved V28 Page 5 and Page 6 PDF layouts.
