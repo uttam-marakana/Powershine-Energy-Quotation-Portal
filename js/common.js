@@ -227,7 +227,24 @@ function pdfCoverRect(page, x, y, width, height, color = [1, 1, 1]) {
     y,
     width,
     height,
-    color: PDFLib.rgb(...color)
+    color: PDFLib.rgb(...color),
+    borderColor: PDFLib.rgb(...color),
+    borderWidth: 0
+  });
+}
+
+// White cleanup rectangles are intentionally borderless. pdf-lib can retain a
+// visible default stroke when a fill rectangle is used as an eraser; that
+// stroke must never appear in the final quotation PDF.
+function drawBorderlessMask(page, { x, y, width, height, color = PDFLib.rgb(1, 1, 1) }) {
+  page.drawRectangle({
+    x,
+    y,
+    width,
+    height,
+    color,
+    borderColor: color,
+    borderWidth: 0
   });
 }
 
@@ -790,7 +807,7 @@ function addBankDetailSpacing(pdfDoc) {
   // template text that extends a little beyond the bank divider. This prevents
   // fragments such as "ne energy", "26", or "ad, Rajkot" from leaking
   // into the signature column after the new text is drawn.
-  page.drawRectangle({
+  drawBorderlessMask(page, {
     x: 198,
     y: height - 205,
     width: 232,
@@ -877,7 +894,7 @@ function drawThankYouPageUpdates(pdfDoc) {
   // Fully clear the original contact text. The supplied template has text
   // extending below the first visible lines, so the old mobile/address values
   // must be masked through the lower edge of the contact blocks.
-  page.drawRectangle({
+  drawBorderlessMask(page, {
     x: 205,
     y: 420,
     width: 350,
