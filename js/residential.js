@@ -2,7 +2,7 @@
 // Panel wattage is intentionally the only dependent dropdown.
 // Panel Brand and Panel Type remain radio-button fields.
 const PANEL_WATT_RANGES = {
-  APS: {
+  Aps: {
     Bifacial: { min: 550, max: 550 },
     Topcon: { min: 600, max: 600 }
   },
@@ -10,7 +10,7 @@ const PANEL_WATT_RANGES = {
     Bifacial: { min: 530, max: 540 },
     Topcon: { min: 580, max: 610 }
   },
-  ADANI: {
+  Adani: {
     Bifacial: { min: 550, max: 555 },
     Topcon: { min: 610, max: 620 }
   },

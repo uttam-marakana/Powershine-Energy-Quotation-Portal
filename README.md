@@ -173,3 +173,9 @@ The Residential and Commercial quotation forms include responsive layouts for de
 ## Current v22 updates
 
 See `docs/V22-CHANGES.md` for the latest changes.
+
+
+### Latest brand options
+Panel Brand: Aps, Waaree, Adani, Solarium
+
+Inverter Brand: Rem, Aps, Polycab, Solaryaan

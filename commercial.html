@@ -74,8 +74,13 @@
           </div>
 
           <div class="form-group">
-            <label>Panel Brand</label>
-            <input type="text" class="form-control" id="panelBrand" placeholder="e.g. ADANI, Waaree, etc.">
+            <label>Panel Brand <span class="req">*</span></label>
+            <div class="radio-group">
+              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_aps" value="Aps" required><label for="cpb_aps">Aps</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_waaree" value="Waaree"><label for="cpb_waaree">Waaree</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_adani" value="Adani"><label for="cpb_adani">Adani</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_solarium" value="Solarium"><label for="cpb_solarium">Solarium</label></div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -93,7 +98,12 @@
 
           <div class="form-group">
             <label>Inverter Brand <span class="req">*</span></label>
-            <input type="text" class="form-control" id="inverterBrand" placeholder="e.g. VSOLE, Solaryaan..." required>
+            <div class="radio-group">
+              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_rem" value="Rem" required><label for="cib_rem">Rem</label></div>
+              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_aps" value="Aps"><label for="cib_aps">Aps</label></div>
+              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_polycab" value="Polycab"><label for="cib_polycab">Polycab</label></div>
+              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_solaryaan" value="Solaryaan"><label for="cib_solaryaan">Solaryaan</label></div>
+            </div>
           </div>
 
           <div class="form-group">
