@@ -179,3 +179,8 @@ See `docs/V22-CHANGES.md` for the latest changes.
 Panel Brand: Aps, Waaree, Adani, Solarium
 
 Inverter Brand: Rem, Aps, Polycab, Solaryaan
+
+
+## Latest Version
+
+**V28** — Restores the approved PDF Page 5 Bank Details and Page 6 Thank You layouts exactly from the supplied quotation template.
