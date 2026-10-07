@@ -516,7 +516,7 @@ function drawQuotationPage(pdfDoc, data) {
     lineHeight: 12
   });
   pdfText(pdfDoc, page, data.companyAddress || 'PowerShine Energy', 34, infoTop - 48, {
-    size: 8.4,
+    size: 8.8,
     color: dark,
     maxWidth: 155,
     lineHeight: 10.5
@@ -534,7 +534,7 @@ function drawQuotationPage(pdfDoc, data) {
   let billY = infoTop - 25;
   if (data.customerBusinessName) {
     billY = pdfText(pdfDoc, page, data.customerBusinessName, 220, billY, {
-      size: 9.4,
+      size: 10.0,
       bold: true,
       color: dark,
       maxWidth: 140,
@@ -551,14 +551,14 @@ function drawQuotationPage(pdfDoc, data) {
   }) - 13;
 
   billY = pdfText(pdfDoc, page, data.customerAddress || data.city || '—', 220, billY, {
-    size: 8.2,
+    size: 8.8,
     color: dark,
     maxWidth: 140,
     lineHeight: 10
   }) - 13;
 
   pdfText(pdfDoc, page, `Mobile : ${data.mobile || data.contactNo || '—'}`, 220, billY, {
-    size: 8.2,
+    size: 8.8,
     color: dark,
     maxWidth: 140
   });
@@ -568,7 +568,7 @@ function drawQuotationPage(pdfDoc, data) {
   // customer name + customer/contact number. Partner code is entered manually by the dealer.
   // ---------------------------------------------------------------
   const metaX = 390;
-  const metaValueX = 468;
+  const metaValueX = 482;
   const meta = [
     ['Date:', formatDateForPdf(data.date)],
     ['Expiry Date:', data.expiryDate ? formatDateForPdf(data.expiryDate) : '—'],
@@ -581,7 +581,7 @@ function drawQuotationPage(pdfDoc, data) {
   meta.forEach(([label, value], index) => {
     const y = infoTop - 8 - index * 18;
     pdfText(pdfDoc, page, label, metaX, y, {
-      size: 7.8,
+      size: 8.1,
       bold: true,
       color: orange
     });
@@ -589,8 +589,8 @@ function drawQuotationPage(pdfDoc, data) {
       left: metaValueX,
       right: width - 34
     }, y, {
-      size: 7.8,
-      minSize: 6.4,
+      size: 8.1,
+      minSize: 6.6,
       color: dark,
       align: 'left'
     });
@@ -638,23 +638,23 @@ function drawQuotationPage(pdfDoc, data) {
 
   const headerY = tableY + 7;
   pdfText(pdfDoc, page, '#', cols.no, headerY, {
-    size: 7.8, bold: true, color: white
+    size: 8.4, bold: true, color: white
   });
   pdfText(pdfDoc, page, 'Item & Description', cols.desc, headerY, {
-    size: 7.8, bold: true, color: white
+    size: 8.4, bold: true, color: white
   });
 
   pdfColumnText(pdfDoc, page, 'Qty', cols.qty, headerY, {
-    size: 7.8, bold: true, color: white, align: 'center'
+    size: 8.4, bold: true, color: white, align: 'center'
   });
   pdfColumnText(pdfDoc, page, 'Rate', cols.rate, headerY, {
-    size: 7.8, bold: true, color: white, align: 'right'
+    size: 8.4, bold: true, color: white, align: 'right'
   });
   pdfColumnText(pdfDoc, page, 'Discount', cols.discount, headerY, {
-    size: 7.8, bold: true, color: white, align: 'right'
+    size: 8.4, bold: true, color: white, align: 'right'
   });
   pdfColumnText(pdfDoc, page, 'Total', cols.total, headerY, {
-    size: 7.8, bold: true, color: white, align: 'right'
+    size: 8.4, bold: true, color: white, align: 'right'
   });
 
   let currentY = tableY;
@@ -679,7 +679,7 @@ function drawQuotationPage(pdfDoc, data) {
     });
 
     pdfText(pdfDoc, page, row.description || '—', cols.desc, currentY + rowHeight - 16, {
-      size: 8.4,
+      size: 9.0,
       bold: true,
       color: dark,
       maxWidth: cols.descMaxWidth,
@@ -687,7 +687,7 @@ function drawQuotationPage(pdfDoc, data) {
     });
 
     pdfText(pdfDoc, page, row.detail || '', cols.desc, currentY + rowHeight - 31, {
-      size: 7.2,
+      size: 7.8,
       color: muted,
       maxWidth: cols.descMaxWidth,
       lineHeight: 8
@@ -696,25 +696,25 @@ function drawQuotationPage(pdfDoc, data) {
     const cellY = currentY + rowHeight - 16;
 
     pdfColumnText(pdfDoc, page, String(row.qty || '1'), cols.qty, cellY, {
-      size: 7.8,
+      size: 8.4,
       color: dark,
       align: 'center'
     });
 
     pdfColumnText(pdfDoc, page, row.rate || '₹ 0', cols.rate, cellY, {
-      size: 7.8,
+      size: 8.4,
       color: dark,
       align: 'right'
     });
 
     pdfColumnText(pdfDoc, page, row.discount || '0 %', cols.discount, cellY, {
-      size: 7.8,
+      size: 8.4,
       color: dark,
       align: 'right'
     });
 
     pdfColumnText(pdfDoc, page, row.total || '₹ 0', cols.total, cellY, {
-      size: 8.0,
+      size: 8.6,
       bold: true,
       color: dark,
       align: 'right'
@@ -786,12 +786,24 @@ function addBankDetailSpacing(pdfDoc) {
   // The white mask fully covers the original bank body through its natural
   // right edge, preventing any leftover characters from the template from
   // showing through into the signature column.
+  // Mask the complete original bank body, including the portion of the
+  // template text that extends a little beyond the bank divider. This prevents
+  // fragments such as "ne energy", "26", or "ad, Rajkot" from leaking
+  // into the signature column after the new text is drawn.
   page.drawRectangle({
-    x: 200,
-    y: height - 202,
-    width: 173,
-    height: 94,
+    x: 198,
+    y: height - 205,
+    width: 232,
+    height: 102,
     color: white
+  });
+
+  // Restore the bank/signature divider after masking.
+  page.drawLine({
+    start: { x: 375, y: height - 205 },
+    end: { x: 375, y: height - 103 },
+    thickness: 0.5,
+    color: PDFLib.rgb(0.84, 0.84, 0.84)
   });
 
   const lines = [
@@ -809,7 +821,7 @@ function addBankDetailSpacing(pdfDoc) {
     pdfText(pdfDoc, page, line, 204, y, {
       size: 8.6,
       color: dark,
-      maxWidth: 164,
+      maxWidth: 158,
       lineHeight: 10.5
     });
     y -= 13;
@@ -862,21 +874,18 @@ function drawThankYouPageUpdates(pdfDoc) {
   // Refresh the two requested contact blocks on the final Thank You page.
   // The middle contact-row mobile value is used for Communication, while the
   // first PowerShine contact-row value is used for Corporate Office.
+  // Fully clear the original contact text. The supplied template has text
+  // extending below the first visible lines, so the old mobile/address values
+  // must be masked through the lower edge of the contact blocks.
   page.drawRectangle({
-    x: 207,
-    y: 447,
-    width: 145,
-    height: 68,
-    color: white
-  });
-  page.drawRectangle({
-    x: 374,
-    y: 447,
-    width: 177,
-    height: 68,
+    x: 205,
+    y: 420,
+    width: 350,
+    height: 100,
     color: white
   });
 
+  // Keep the lower PowerShine / MOBILE / EMAIL row untouched.
   pdfText(pdfDoc, page, ':: COMMUNICATION ::', 211, 506, {
     size: 7.8,
     bold: true,
