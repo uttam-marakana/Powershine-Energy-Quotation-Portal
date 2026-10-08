@@ -1,4 +1,4 @@
-# PowerShine Energy Quotation Portal — v29
+# PowerShine Energy Quotation Portal — v30
 
 A lightweight static quotation portal for PowerShine Energy dealers. It supports separate Residential and Commercial quotation forms, a shared quotation data model, a supplied 6-page PDF quotation template, in-browser PDF generation, final PDF preview, and PDF download.
 
@@ -748,6 +748,42 @@ vercel.json
 ```
 
 for the required static deployment configuration.
+
+---
+
+# V30 Change History
+
+## V30
+
+V30 is the latest project update based directly on the V29 project baseline.
+
+The V30 update includes:
+
+1. Re-enabled the **Commercial** item in the main navigation menu.
+2. Re-enabled the **Commercial Quotation** card on the home page.
+3. Restored the direct Commercial form URL:
+   `commercial.html`
+4. Confirmed the Commercial quotation continues to use the same shared PDF generation system and the same six-page quotation template used by the Residential quotation.
+5. Replaced the final template page using **Page 9 (the final Thank You page) from the latest supplied reference file `EST-006907.pdf`**.
+6. Updated both template copies to use the same final six-page PDF:
+   - `assets/quotation-template.pdf`
+   - `docs/powershine-energy-final-quotation-template.pdf`
+7. No Commercial calculation logic, PDF mapping logic, Residential behavior, CSS, or other quotation functionality was changed as part of the Commercial menu re-enable/template update.
+
+### Current PDF Template
+
+The shared quotation template is now:
+
+```text
+Page 1 — Cover
+Page 2 — About PowerShine Energy
+Page 3 — Product Photos
+Page 4 — Quotation
+Page 5 — Notes + Bank Details + Terms & Conditions
+Page 6 — Thank You (from Page 9 of EST-006907.pdf)
+```
+
+Both Residential and Commercial forms use this same template.
 
 ---
 
