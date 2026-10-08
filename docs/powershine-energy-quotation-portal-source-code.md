@@ -15,7 +15,7 @@
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <img class="logo-image" src="assets/powershine-energy-ai-logo.png" alt="PowerShine Energy">
+        <img class="logo-image" src="assets/powershine-energy-logo.png" alt="PowerShine Energy">
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>
@@ -89,7 +89,7 @@
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <img class="logo-image" src="assets/powershine-energy-ai-logo.png" alt="PowerShine Energy">
+        <img class="logo-image" src="assets/powershine-energy-logo.png" alt="PowerShine Energy">
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>
@@ -298,7 +298,7 @@
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <img class="logo-image" src="assets/powershine-energy-ai-logo.png" alt="PowerShine Energy">
+        <img class="logo-image" src="assets/powershine-energy-logo.png" alt="PowerShine Energy">
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>
@@ -2493,7 +2493,7 @@ No backend, SMTP service, Nodemailer, database, or email API is required.
 
 ## Logo
 
-`assets/powershine-energy-ai-logo.png` is a newly generated PowerShine Energy portal logo concept based on the public site's solar-energy positioning, brand name, and tagline. It is a project asset, not claimed to be the official trademark artwork from the website. The lightweight SVG fallback remains available as `assets/powershine-energy-logo.svg`.
+`assets/powershine-energy-logo.png` is a newly generated PowerShine Energy portal logo concept based on the public site's solar-energy positioning, brand name, and tagline. It is a project asset, not claimed to be the official trademark artwork from the website. The lightweight SVG fallback remains available as `assets/powershine-energy-logo.svg`.
 
 ## Panel Wattage Rules
 
@@ -2555,7 +2555,7 @@ The supplied quotation template keeps the existing PowerShine Energy layout, but
 - `js/residential.js` — residential calculations and PDF data mapping
 - `js/commercial.js` — commercial calculations and PDF data mapping
 - `assets/quotation-template.pdf` — 6-page quotation template
-- `assets/powershine-energy-ai-logo.png` — PowerShine Energy logo asset
+- `assets/powershine-energy-logo.png` — PowerShine Energy logo asset
 - `assets/powershine-energy-logo.svg` — SVG logo fallback
 - `assets/powershine-energy-logo.png` — PNG logo fallback
 - `assets/quotation-footer.png` — exact footer artwork reused on page 1

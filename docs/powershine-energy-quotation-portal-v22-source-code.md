@@ -17,7 +17,7 @@
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <img class="logo-image" src="assets/powershine-energy-ai-logo.png" alt="PowerShine Energy">
+        <img class="logo-image" src="assets/powershine-energy-logo.png" alt="PowerShine Energy">
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>
@@ -79,7 +79,7 @@
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <img class="logo-image" src="assets/powershine-energy-ai-logo.png" alt="PowerShine Energy">
+        <img class="logo-image" src="assets/powershine-energy-logo.png" alt="PowerShine Energy">
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>
@@ -275,7 +275,7 @@
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">
-        <img class="logo-image" src="assets/powershine-energy-ai-logo.png" alt="PowerShine Energy">
+        <img class="logo-image" src="assets/powershine-energy-logo.png" alt="PowerShine Energy">
       </a>
       <nav class="nav">
         <a href="index.html">Home</a>

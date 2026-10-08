@@ -8,7 +8,6 @@
 - `js/residential.js`
 - `js/commercial.js`
 - `assets/quotation-template.pdf`
-- `assets/powershine-energy-ai-logo.png`
 - `assets/powershine-energy-logo.svg`
 - `assets/powershine-energy-logo.png`
 - `assets/quotation-footer.png`

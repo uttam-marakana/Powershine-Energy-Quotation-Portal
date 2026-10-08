@@ -439,7 +439,7 @@ powershine-energy-quotation-portal/
 │
 ├── assets/
 │   ├── favicon.png
-│   ├── powershine-energy-ai-logo.png
+│   ├── powershine-energy-logo.png
 │   ├── powershine-energy-logo.png
 │   ├── powershine-energy-logo.svg
 │   ├── quotation-footer.png
@@ -447,7 +447,7 @@ powershine-energy-quotation-portal/
 │
 ├── docs/
 │   ├── PACKAGE-CONTENTS.md
-│   ├── powershine-energy-ai-logo.png
+│   ├── powershine-energy-logo.png
 │   └── powershine-energy-final-quotation-template.pdf
 │
 ├── README.md
@@ -573,7 +573,7 @@ Responsible for:
 The project includes:
 
 ```text
-assets/powershine-energy-ai-logo.png
+assets/powershine-energy-logo.png
 assets/powershine-energy-logo.png
 assets/powershine-energy-logo.svg
 ```
