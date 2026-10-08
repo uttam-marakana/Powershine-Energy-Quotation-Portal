@@ -227,24 +227,7 @@ function pdfCoverRect(page, x, y, width, height, color = [1, 1, 1]) {
     y,
     width,
     height,
-    color: PDFLib.rgb(...color),
-    borderColor: PDFLib.rgb(...color),
-    borderWidth: 0
-  });
-}
-
-// White cleanup rectangles are intentionally borderless. pdf-lib can retain a
-// visible default stroke when a fill rectangle is used as an eraser; that
-// stroke must never appear in the final quotation PDF.
-function drawBorderlessMask(page, { x, y, width, height, color = PDFLib.rgb(1, 1, 1) }) {
-  page.drawRectangle({
-    x,
-    y,
-    width,
-    height,
-    color,
-    borderColor: color,
-    borderWidth: 0
+    color: PDFLib.rgb(...color)
   });
 }
 
@@ -793,6 +776,7 @@ function drawQuotationPage(pdfDoc, data) {
 }
 
 function amountInWordsINR(amount) {
+  // Lightweight Indian-number formatter for the quotation template.
   const n = Math.round(Number(amount) || 0);
   if (n === 0) return 'Indian Rupee Zero Only';
 
@@ -832,11 +816,6 @@ async function buildTemplateQuotation(data) {
 
   drawCoverPage(pdfDoc, data);
   drawQuotationPage(pdfDoc, data);
-
-  // Pages 5 and 6 are preserved exactly from the approved quotation
-  // template. Do not redraw or mask their Bank Details / Thank You content.
-  // This keeps the typography, spacing, contact blocks, signature area, and
-  // footer layout identical to the supplied reference pages.
 
   return pdfDoc;
 }
@@ -982,3 +961,4 @@ document.addEventListener('DOMContentLoaded', () => {
   // template download after the dealer clicks the button.
   preloadQuotationAssets();
 });
+

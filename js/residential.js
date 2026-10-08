@@ -231,3 +231,4 @@ document.addEventListener('DOMContentLoaded', () => {
   panelWatt.addEventListener('change', syncSystemKW);
   updatePanelWattOptions();
 });
+
