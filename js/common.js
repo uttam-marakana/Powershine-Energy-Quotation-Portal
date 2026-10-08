@@ -1,6 +1,7 @@
 // Common utilities for Powershine Energy Quotation Portal
 
-const QUOTATION_TEMPLATE_URL = 'assets/quotation-template.pdf';
+// Versioned URL prevents browsers/CDNs from reusing an older cached template.
+const QUOTATION_TEMPLATE_URL = 'assets/quotation-template.pdf?v=30-20261008-1';
 
 function toggleOther(inputId) {
   const input = document.getElementById(inputId);

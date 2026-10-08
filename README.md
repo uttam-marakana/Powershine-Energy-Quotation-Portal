@@ -1,6 +1,6 @@
-# PowerShine Energy Quotation Portal — v30
+# PowerShine Energy Quotation Portal — v30.1
 
-A lightweight static quotation portal for PowerShine Energy dealers. It supports separate Residential and Commercial quotation forms, a shared quotation data model, a supplied 6-page PDF quotation template, in-browser PDF generation, final PDF preview, and PDF download.
+A lightweight static quotation portal for PowerShine Energy dealers. It supports separate Residential and Commercial quotation forms, a shared quotation data model, a supplied 6-page PDF quotation template, in-browser PDF generation, final PDF preview, and PDF download. The quotation template URL is versioned so the latest 6-page template is loaded instead of an older browser/CDN cache.
 
 ---
 
