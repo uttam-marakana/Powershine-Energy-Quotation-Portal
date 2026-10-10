@@ -1,7 +1,7 @@
 // Common utilities for Powershine Energy Quotation Portal
 
 // Versioned URL prevents browsers/CDNs from reusing an older cached template.
-const QUOTATION_TEMPLATE_URL = 'assets/quotation-template.pdf?v=30-20261008-1';
+const QUOTATION_TEMPLATE_URL = 'assets/quotation-template.pdf?v=31-20261010-1';
 
 function toggleOther(inputId) {
   const input = document.getElementById(inputId);
@@ -320,15 +320,21 @@ function drawCoverPage(pdfDoc, data) {
   pdfCoverRect(page, 300, height - 230, width - 300, 230, orange);
   pdfCoverRect(page, 300, 0, width - 300, 245, orange);
 
-  pdfText(pdfDoc, page, 'Roof Top Solar', 345, height - 62, {
-    size: 25,
+  // Center both title lines within the orange cover panel instead of using
+  // separate hard-coded x positions that leave the heading visually uneven.
+  const coverTitleRight = width;
+  const coverTitleCenter = (300 + coverTitleRight) / 2;
+  const coverTitleSize = 25;
+  const coverTitleWidth = pdfDoc.__fonts.bold.widthOfTextAtSize('Roof Top Solar', coverTitleSize);
+  const proposalWidth = pdfDoc.__fonts.bold.widthOfTextAtSize('Proposal', coverTitleSize);
+
+  pdfText(pdfDoc, page, 'Roof Top Solar', coverTitleCenter - coverTitleWidth / 2, height - 62, {
+    size: coverTitleSize,
     bold: true,
-    color: white,
-    maxWidth: 220,
-    lineHeight: 29
+    color: white
   });
-  pdfText(pdfDoc, page, 'Proposal', 425, height - 104, {
-    size: 25,
+  pdfText(pdfDoc, page, 'Proposal', coverTitleCenter - proposalWidth / 2, height - 104, {
+    size: coverTitleSize,
     bold: true,
     color: white
   });
@@ -680,18 +686,18 @@ function drawQuotationPage(pdfDoc, data) {
     });
 
     pdfText(pdfDoc, page, row.description || '—', cols.desc, currentY + rowHeight - 16, {
-      size: 9.0,
+      size: 10.0,
       bold: true,
       color: dark,
       maxWidth: cols.descMaxWidth,
-      lineHeight: 9.5
+      lineHeight: 11.5
     });
 
     pdfText(pdfDoc, page, row.detail || '', cols.desc, currentY + rowHeight - 31, {
-      size: 7.8,
+      size: 9.0,
       color: muted,
       maxWidth: cols.descMaxWidth,
-      lineHeight: 8
+      lineHeight: 10
     });
 
     const cellY = currentY + rowHeight - 16;
@@ -739,18 +745,18 @@ function drawQuotationPage(pdfDoc, data) {
   });
 
   pdfText(pdfDoc, page, data.amountInWords || '', 40, summaryTop - 22, {
-    size: 8.0,
+    size: 9.0,
     color: dark,
     maxWidth: 300,
-    lineHeight: 10
+    lineHeight: 11
   });
 
   if (data.note) {
     pdfText(pdfDoc, page, `Note: ${data.note}`, 40, summaryTop - 50, {
-      size: 7.4,
+      size: 8.5,
       color: muted,
       maxWidth: 300,
-      lineHeight: 8
+      lineHeight: 9.5
     });
   }
 
