@@ -1,190 +1,428 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Commercial Quotation | Powershine Energy</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-</head>
-<body>
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo">
-        <img class="logo-image" src="assets/powershine-energy-logo.png" alt="PowerShine Energy">
-      </a>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="residential.html" target="_blank">Residential</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="main">
-    <div class="form-container" id="quoteForm">
-      <div class="form-header">
-        <h1>QT Commercial Quotation</h1>
-        <p>Commercial / Industrial Solar Quotation · Powershine Energy Dealer</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Commercial Quotation | Powershine Energy</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <img
+            class="logo-image"
+            src="assets/powershine-energy-logo.png"
+            alt="PowerShine Energy"
+          />
+        </a>
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="residential.html" target="_blank">Residential</a>
+        </nav>
       </div>
-      <div class="form-body">
-        <div class="alert alert-info">
-          * Indicates required fields. System calculates total = (Inverter kW × Rate) + charges. Click Generate PDF & Preview to review the generated PDF before downloading.
+    </header>
+
+    <main class="main">
+      <div class="form-container" id="quoteForm">
+        <div class="form-header">
+          <h1>QT Commercial Quotation</h1>
+          <p>
+            Commercial / Industrial Solar Quotation · Powershine Energy Dealer
+          </p>
         </div>
-
-        <form id="commercialForm" onsubmit="return false;">
-          <!-- Customer -->
-          <div class="section-title">Customer Details</div>
-
-          <div class="form-group">
-            <label>Date <span class="req">*</span></label>
-            <input type="date" class="form-control" id="date" required>
+        <div class="form-body">
+          <div class="alert alert-info">
+            * Indicates required fields. System calculates total = (Inverter kW
+            × Rate) + charges. Click Generate PDF & Preview to review the
+            generated PDF before downloading.
           </div>
 
-          <div class="form-group">
-            <label>NAME OF CUSTOMER <span class="req">*</span></label>
-            <input type="text" class="form-control" id="name" placeholder="Customer / Company name" required>
-          </div>
+          <form id="commercialForm" onsubmit="return false;">
+            <!-- Customer -->
+            <div class="section-title">Customer Details</div>
 
-          <div class="form-group">
-            <label>Business Name</label>
-            <input type="text" class="form-control" id="businessName" placeholder="Business / Firm name">
-          </div>
-
-          <div class="form-group">
-            <label>GST No</label>
-            <input type="text" class="form-control" id="gstNo" placeholder="GSTIN (if available)">
-          </div>
-
-          <div class="form-group">
-            <label>Contact No <span class="req">*</span></label>
-            <input type="tel" class="form-control" id="contactNo" placeholder="Mobile / Landline" required>
-          </div>
-
-          <div class="form-group">
-            <label>Address <span class="req">*</span></label>
-            <textarea class="form-control" id="address" rows="2" placeholder="Full installation address" required></textarea>
-          </div>
-
-          <!-- Plant -->
-          <div class="section-title">Plant & Panel Details</div>
-
-          <div class="form-group">
-            <label>Plant Size <span class="req">*</span></label>
-            <input type="text" class="form-control" id="plantSize" placeholder="e.g. 50 kW / 100 kW" required>
-          </div>
-
-          <div class="form-group">
-            <label>Panel Brand <span class="req">*</span></label>
-            <div class="radio-group">
-              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_aps" value="Aps" required><label for="cpb_aps">Aps</label></div>
-              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_waaree" value="Waaree"><label for="cpb_waaree">Waaree</label></div>
-              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_adani" value="Adani"><label for="cpb_adani">Adani</label></div>
-              <div class="radio-item"><input type="radio" name="panelBrand" id="cpb_solarium" value="Solarium"><label for="cpb_solarium">Solarium</label></div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Panel Quantity</label>
-            <input type="number" class="form-control" id="panelQty" min="0" placeholder="Number of panels" oninput="calcCommercial()">
-          </div>
-
-          <div class="form-group">
-            <label>Panel Watt</label>
-            <input type="number" class="form-control" id="panelWatt" min="0" placeholder="Wattage per panel" oninput="calcCommercial()">
-          </div>
-
-          <!-- Inverter -->
-          <div class="section-title">Inverter & Pricing</div>
-
-          <div class="form-group">
-            <label>Inverter Brand <span class="req">*</span></label>
-            <div class="radio-group">
-              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_rem" value="Rem" required><label for="cib_rem">Rem</label></div>
-              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_aps" value="Aps"><label for="cib_aps">Aps</label></div>
-              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_polycab" value="Polycab"><label for="cib_polycab">Polycab</label></div>
-              <div class="radio-item"><input type="radio" name="inverterBrand" id="cib_solaryaan" value="Solaryaan"><label for="cib_solaryaan">Solaryaan</label></div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Inverter kW</label>
-            <input type="number" class="form-control" id="inverterKW" step="0.01" min="0" placeholder="e.g. 50" oninput="calcCommercial()">
-          </div>
-
-          <div class="form-group">
-            <label>Rate (Per kW) <span class="req">*</span></label>
-            <input type="number" class="form-control" id="ratePerKW" min="0" placeholder="₹ per kW" required oninput="calcCommercial()">
-          </div>
-
-          <div class="form-group">
-            <label>Registration Charges <span class="req">*</span></label>
-            <div class="radio-group">
-              <div class="radio-item"><input type="radio" name="regCharges" value="0" checked onchange="calcCommercial()"><label>₹ 0</label></div>
-              <div class="radio-item"><input type="radio" name="regCharges" value="15410" onchange="calcCommercial()"><label>₹ 15,410</label></div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Meter Charge 1 <span class="req">*</span></label>
-            <input type="number" class="form-control" id="meterCharge" min="0" value="0" required oninput="calcCommercial()">
-          </div>
-
-          <div class="form-group">
-            <label>Other Government charges (If any)</label>
-            <input type="number" class="form-control" id="otherGovt" min="0" value="0" oninput="calcCommercial()">
-          </div>
-
-          <div class="form-group">
-            <label>Note <span class="req">*</span></label>
-            <textarea class="form-control" id="note" rows="2" placeholder="Any special notes / terms" required></textarea>
-          </div>
-
-          <!-- Summary -->
-          <div class="calc-box" id="calcSummary">
-            <h3>📊 Quotation Summary</h3>
-            <div class="calc-row"><span>Inverter Capacity</span><span id="sumKW">—</span></div>
-            <div class="calc-row"><span>Rate × kW</span><span id="sumBase">—</span></div>
-            <div class="calc-row"><span>Registration</span><span id="sumReg">—</span></div>
-            <div class="calc-row"><span>Meter Charge</span><span id="sumMeter">—</span></div>
-            <div class="calc-row"><span>Other Govt Charges</span><span id="sumOther">—</span></div>
-            <div class="calc-row total"><span>Grand Total</span><span id="sumTotal">—</span></div>
-          </div>
-          <!-- Creator -->
-          <div class="section-title">Quotation Creator</div>
-
-          <div class="creator-auto-grid">
             <div class="form-group">
-              <label>Quotation Creator Name <span class="req">*</span></label>
-              <input type="text" class="form-control" id="creatorDisplayName" placeholder="Enter quotation creator name" required>
+              <label>Date <span class="req">*</span></label>
+              <input type="date" class="form-control" id="date" required />
             </div>
 
             <div class="form-group">
-              <label>Quotation Creator Mobile <span class="req">*</span></label>
-              <input type="tel" class="form-control" id="creatorDisplayMobile" placeholder="Enter quotation creator mobile" inputmode="numeric" pattern="[0-9+()\- ]{10,15}" required>
+              <label>NAME OF CUSTOMER <span class="req">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                placeholder="Customer / Company name"
+                required
+              />
             </div>
 
-            <div class="form-group creator-code-group">
-              <label for="channelPartnerCode">Channel Partner Code</label>
-              <input type="text" class="form-control" id="channelPartnerCode" value="CP-" placeholder="CP-001" autocomplete="off">
+            <div class="form-group">
+              <label>Business Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="businessName"
+                placeholder="Business / Firm name"
+              />
             </div>
-          </div>
 
-          <div class="form-actions">
-            <button type="button" class="btn btn-primary" onclick="calcCommercial()">🔄 Recalculate</button>
-            <button type="button" class="btn btn-success" onclick="generatePDF()">📄 Generate PDF & Preview</button>
-            <button type="button" class="btn btn-outline" onclick="document.getElementById('commercialForm').reset(); syncQuotationCreator(); calcCommercial();">Clear Form</button>
-          </div>
+            <div class="form-group">
+              <label>GST No</label>
+              <input
+                type="text"
+                class="form-control"
+                id="gstNo"
+                placeholder="GSTIN (if available)"
+              />
+            </div>
 
-        </form>
+            <div class="form-group">
+              <label>Contact No <span class="req">*</span></label>
+              <input
+                type="tel"
+                class="form-control"
+                id="contactNo"
+                placeholder="Mobile / Landline"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Address <span class="req">*</span></label>
+              <textarea
+                class="form-control"
+                id="address"
+                rows="2"
+                placeholder="Full installation address"
+                required
+              ></textarea>
+            </div>
+
+            <!-- Plant -->
+            <div class="section-title">Plant & Panel Details</div>
+
+            <div class="form-group">
+              <label>Plant Size <span class="req">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="plantSize"
+                placeholder="e.g. 50 kW / 100 kW"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Panel Brand <span class="req">*</span></label>
+              <div class="radio-group">
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="panelBrand"
+                    id="cpb_aps"
+                    value="Aps"
+                    required
+                  /><label for="cpb_aps">Aps</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="panelBrand"
+                    id="cpb_waaree"
+                    value="Waaree"
+                  /><label for="cpb_waaree">Waaree</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="panelBrand"
+                    id="cpb_adani"
+                    value="Adani"
+                  /><label for="cpb_adani">Adani</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="panelBrand"
+                    id="cpb_solarium"
+                    value="Solarium"
+                  /><label for="cpb_solarium">Solarium</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="panelBrand"
+                    id="cpb_other"
+                    value="Other"
+                  /><label for="cpb_other">Other</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Panel Quantity</label>
+              <input
+                type="text"
+                class="form-control"
+                id="panelQty"
+                min="0"
+                placeholder="Number of panels"
+                oninput="calcCommercial()"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Panel Watt</label>
+              <input
+                type="text"
+                class="form-control"
+                id="panelWatt"
+                min="0"
+                placeholder="Wattage per panel"
+                oninput="calcCommercial()"
+              />
+            </div>
+
+            <!-- Inverter -->
+            <div class="section-title">Inverter & Pricing</div>
+
+            <div class="form-group">
+              <label>Inverter Brand <span class="req">*</span></label>
+              <div class="radio-group">
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="inverterBrand"
+                    id="cib_rem"
+                    value="Rem"
+                    required
+                  /><label for="cib_rem">Rem</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="inverterBrand"
+                    id="cib_aps"
+                    value="Aps"
+                  /><label for="cib_aps">Aps</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="inverterBrand"
+                    id="cib_polycab"
+                    value="Polycab"
+                  /><label for="cib_polycab">Polycab</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="inverterBrand"
+                    id="cib_solaryaan"
+                    value="Solaryaan"
+                  /><label for="cib_solaryaan">Solaryaan</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="inverterBrand"
+                    id="cib_other"
+                    value="Other"
+                  /><label for="cib_other">Other</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Inverter kW</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inverterKW"
+                step="0.01"
+                min="0"
+                placeholder="e.g. 50"
+                oninput="calcCommercial()"
+              />
+            </div>
+
+            <!-- <div class="form-group">
+              <label>Rate (Per kW) <span class="req">*</span></label>
+              <input
+                type="number"
+                class="form-control"
+                id="ratePerKW"
+                min="0"
+                placeholder="₹ per kW"
+                required
+                oninput="calcCommercial()"
+              />
+            </div> -->
+
+            <div class="form-group">
+              <label>Registration Charges <span class="req">*</span></label>
+              <div class="radio-group">
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="regCharges"
+                    value="0"
+                    checked
+                    onchange="calcCommercial()"
+                  /><label>₹ 0</label>
+                </div>
+                <div class="radio-item">
+                  <input
+                    type="radio"
+                    name="regCharges"
+                    value="15410"
+                    onchange="calcCommercial()"
+                  /><label>₹ 15,410</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Meter Charge 1 <span class="req">*</span></label>
+              <input
+                type="number"
+                class="form-control"
+                id="meterCharge"
+                min="0"
+                value="0"
+                required
+                oninput="calcCommercial()"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Other Government charges (If any)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="otherGovt"
+                min="0"
+                value="0"
+                oninput="calcCommercial()"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Note <span class="req">*</span></label>
+              <textarea
+                class="form-control"
+                id="note"
+                rows="2"
+                placeholder="Any special notes / terms"
+                required
+              ></textarea>
+            </div>
+
+            <!-- Summary -->
+            <div class="calc-box" id="calcSummary">
+              <h3>📊 Quotation Summary</h3>
+              <div class="calc-row">
+                <span>Inverter Capacity</span><span id="sumKW">—</span>
+              </div>
+              <div class="calc-row">
+                <span>Rate × kW</span><span id="sumBase">—</span>
+              </div>
+              <div class="calc-row">
+                <span>Registration</span><span id="sumReg">—</span>
+              </div>
+              <div class="calc-row">
+                <span>Meter Charge</span><span id="sumMeter">—</span>
+              </div>
+              <div class="calc-row">
+                <span>Other Govt Charges</span><span id="sumOther">—</span>
+              </div>
+              <div class="calc-row total">
+                <span>Grand Total</span><span id="sumTotal">—</span>
+              </div>
+            </div>
+            <!-- Creator -->
+            <div class="section-title">Quotation Creator</div>
+
+            <div class="creator-auto-grid">
+              <div class="form-group">
+                <label>Quotation Creator Name <span class="req">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="creatorDisplayName"
+                  placeholder="Enter quotation creator name"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label
+                  >Quotation Creator Mobile <span class="req">*</span></label
+                >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="creatorDisplayMobile"
+                  placeholder="Enter quotation creator mobile"
+                  inputmode="numeric"
+                  pattern="[0-9+()\- ]{10,15}"
+                  required
+                />
+              </div>
+
+              <div class="form-group creator-code-group">
+                <label for="channelPartnerCode">Channel Partner Code</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="channelPartnerCode"
+                  value="CP-"
+                  placeholder="CP-001"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="calcCommercial()"
+              >
+                🔄 Recalculate
+              </button>
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="generatePDF()"
+              >
+                📄 Generate PDF & Preview
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline"
+                onclick="
+                  document.getElementById('commercialForm').reset();
+                  syncQuotationCreator();
+                  calcCommercial();
+                "
+              >
+                Clear Form
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <footer class="footer">
-    <p>© 2026 Powershine Energy Dealer Portal · Commercial Quotation</p>
-  </footer>
+    <footer class="footer">
+      <p>© 2026 Powershine Energy Dealer Portal · Commercial Quotation</p>
+    </footer>
 
-  <script src="js/common.js"></script>
-  <script src="js/commercial.js"></script>
-</body>
+    <script src="js/common.js"></script>
+    <script src="js/commercial.js"></script>
+  </body>
 </html>
