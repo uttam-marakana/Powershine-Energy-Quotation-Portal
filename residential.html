@@ -60,11 +60,13 @@
           <div class="form-group">
             <label>Panel Brand <span class="req">*</span></label>
             <div class="radio-group">
-              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_aps" value="Aps" onchange="updatePanelWattOptions()"><label for="pb_aps">Aps</label></div>
-              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_waaree" value="Waaree" onchange="updatePanelWattOptions()"><label for="pb_waaree">Waaree</label></div>
-              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_adani" value="Adani" onchange="updatePanelWattOptions()"><label for="pb_adani">Adani</label></div>
-              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_solarium" value="Solarium" onchange="updatePanelWattOptions()"><label for="pb_solarium">Solarium</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_aps" value="Aps" onchange="updatePanelWattOptions();toggleOther('panelBrandOther')"><label for="pb_aps">Aps</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_waaree" value="Waaree" onchange="updatePanelWattOptions();toggleOther('panelBrandOther')"><label for="pb_waaree">Waaree</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_adani" value="Adani" onchange="updatePanelWattOptions();toggleOther('panelBrandOther')"><label for="pb_adani">Adani</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_solarium" value="Solarium" onchange="updatePanelWattOptions();toggleOther('panelBrandOther')"><label for="pb_solarium">Solarium</label></div>
+              <div class="radio-item"><input type="radio" name="panelBrand" id="pb_other" value="Other" onchange="updatePanelWattOptions();toggleOther('panelBrandOther')"><label for="pb_other">Other</label></div>
             </div>
+            <input type="text" class="form-control other-input" id="panelBrandOther" placeholder="Enter panel brand" oninput="calcResidential()">
           </div>
 
           <div class="form-group">
@@ -77,7 +79,7 @@
 
           <div class="form-group">
             <label>No of Panel <span class="req">*</span></label>
-            <input type="text" class="form-control" id="noOfPanel" min="1" placeholder="e.g. 10" required oninput="calcResidential()">
+            <input type="number" step="1" inputmode="numeric" class="form-control" id="noOfPanel" min="1" placeholder="e.g. 10" required oninput="calcResidential()">
           </div>
 
           <div class="form-group">
@@ -93,11 +95,13 @@
           <div class="form-group">
             <label>Inverter Brand</label>
             <div class="radio-group">
-              <div class="radio-item"><input type="radio" name="invBrand" id="ib_rem" value="Rem"><label for="ib_rem">Rem</label></div>
-              <div class="radio-item"><input type="radio" name="invBrand" id="ib_aps" value="Aps"><label for="ib_aps">Aps</label></div>
-              <div class="radio-item"><input type="radio" name="invBrand" id="ib_polycab" value="Polycab"><label for="ib_polycab">Polycab</label></div>
-              <div class="radio-item"><input type="radio" name="invBrand" id="ib_solaryaan" value="Solaryaan"><label for="ib_solaryaan">Solaryaan</label></div>
+              <div class="radio-item"><input type="radio" name="invBrand" id="ib_rem" value="Rem" onchange="toggleOther('invBrandOther')"><label for="ib_rem">Rem</label></div>
+              <div class="radio-item"><input type="radio" name="invBrand" id="ib_aps" value="Aps" onchange="toggleOther('invBrandOther')"><label for="ib_aps">Aps</label></div>
+              <div class="radio-item"><input type="radio" name="invBrand" id="ib_polycab" value="Polycab" onchange="toggleOther('invBrandOther')"><label for="ib_polycab">Polycab</label></div>
+              <div class="radio-item"><input type="radio" name="invBrand" id="ib_solaryaan" value="Solaryaan" onchange="toggleOther('invBrandOther')"><label for="ib_solaryaan">Solaryaan</label></div>
+              <div class="radio-item"><input type="radio" name="invBrand" id="ib_other" value="Other" onchange="toggleOther('invBrandOther')"><label for="ib_other">Other</label></div>
             </div>
+            <input type="text" class="form-control other-input" id="invBrandOther" placeholder="Enter inverter brand">
           </div>
 
           <div class="form-group">
@@ -110,7 +114,7 @@
 
           <div class="form-group">
             <label>Grand Total (₹) <span class="req">*</span></label>
-            <input type="text" inputmode="decimal" pattern="[0-9]+([.][0-9]{1,2})?" class="form-control" id="grandTotal" placeholder="Total project cost before subsidy" required oninput="calcResidential()">
+            <input type="number" inputmode="decimal" step="0.01" min="0" class="form-control" id="grandTotal" placeholder="Total project cost before subsidy" required oninput="calcResidential()">
           </div>
 
           <div class="form-group">
@@ -125,14 +129,19 @@
               <div class="radio-item"><input type="radio" name="subsidy" value="72600" onchange="calcResidential();toggleOther('subsidyOther')"><label>₹ 72,600</label></div>
               <div class="radio-item"><input type="radio" name="subsidy" value="Other" onchange="calcResidential();toggleOther('subsidyOther')"><label>Other</label></div>
             </div>
-            <input type="number" class="form-control other-input" id="subsidyOther" placeholder="Enter custom subsidy amount" oninput="calcResidential()">
+            <input type="number" class="form-control other-input" id="subsidyOther" min="0" step="0.01" inputmode="decimal" placeholder="Enter custom subsidy amount" oninput="calcResidential()">
           </div>
 
           <div class="form-group">
             <label>DISCOM Charge <span class="req">*</span></label>
-            <input type="number" class="form-control" id="discomCharge" min="0" value="0" placeholder="Type 0 if No DISCOM Charge" required oninput="calcResidential()">
+            <input type="number" class="form-control" id="discomCharge" min="0" step="0.01" placeholder="Leave blank if not applicable" oninput="calcResidential()">
           </div>
 
+
+          <div class="form-group">
+            <label>Structure Fees (₹)</label>
+            <input type="number" class="form-control" id="structureFees" min="0" step="0.01" placeholder="Leave blank if not applicable" oninput="calcResidential()">
+          </div>
 
           <!-- Calculated Summary -->
           <div class="calc-box" id="calcSummary">
@@ -140,7 +149,8 @@
             <div class="calc-row"><span>System Size</span><span id="sumKW">—</span></div>
             <div class="calc-row"><span>Grand Total</span><span id="sumGrand">—</span></div>
             <div class="calc-row"><span>Subsidy</span><span id="sumSubsidy">—</span></div>
-            <div class="calc-row"><span>DISCOM Charge</span><span id="sumDiscom">—</span></div>
+            <div class="calc-row" id="discomSummaryRow" hidden><span>DISCOM Charge</span><span id="sumDiscom">—</span></div>
+            <div class="calc-row" id="structureSummaryRow" hidden><span>Structure Fees</span><span id="sumStructure">—</span></div>
             <div class="calc-row total"><span>Customer Payable</span><span id="sumPayable">—</span></div>
           </div>
 

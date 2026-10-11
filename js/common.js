@@ -19,6 +19,7 @@ function toggleOther(inputId) {
   });
 
   input.style.display = show ? 'block' : 'none';
+  input.required = show;
   if (!show) input.value = '';
 }
 
@@ -613,7 +614,7 @@ function drawQuotationPage(pdfDoc, data) {
   const tableW = width - 56;
   const headerH = 22;
 
-  const rows = (data.rows || []).slice(0, 3);
+  const rows = (data.rows || []).slice(0, 4);
   const rowHeights = rows.map((row) => {
     const detailLines = String(row.detail || '').split('\n').length;
     return Math.min(112, Math.max(72, 62 + detailLines * 9));

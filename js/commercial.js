@@ -4,19 +4,21 @@ function calcCommercial() {
   const base = invKW * rate;
 
   const reg = parseFloat(getRadioValue('regCharges')) || 0;
-  const meter = parseFloat(document.getElementById('meterCharge').value) || 0;
-  const other = parseFloat(document.getElementById('otherGovt').value) || 0;
+  const meter = Math.max(0, parseFloat(document.getElementById('meterCharge').value) || 0);
+  const structure = Math.max(0, parseFloat(document.getElementById('structureCost').value) || 0);
 
-  const total = base + reg + meter + other;
+  const total = base + reg + meter + structure;
 
   document.getElementById('sumKW').textContent = invKW ? `${invKW.toFixed(2)} kW` : '—';
   document.getElementById('sumBase').textContent = formatINR(base);
   document.getElementById('sumReg').textContent = formatINR(reg);
   document.getElementById('sumMeter').textContent = formatINR(meter);
-  document.getElementById('sumOther').textContent = formatINR(other);
+  document.getElementById('sumStructure').textContent = formatINR(structure);
+  document.getElementById('meterSummaryRow').hidden = meter <= 0;
+  document.getElementById('structureSummaryRow').hidden = structure <= 0;
   document.getElementById('sumTotal').textContent = formatINR(total);
 
-  return { invKW, rate, base, reg, meter, other, total };
+  return { invKW, rate, base, reg, meter, structure, total };
 }
 
 function buildCommercialQuotationData() {
@@ -26,10 +28,12 @@ function buildCommercialQuotationData() {
   const gstNo = document.getElementById('gstNo').value.trim();
   const address = document.getElementById('address').value.trim();
   const plantSize = document.getElementById('plantSize').value.trim();
-  const panelBrand = document.getElementById('panelBrand').value.trim();
+  const panelBrandValue = getRadioValue('panelBrand');
+  const panelBrand = panelBrandValue === 'Other' ? document.getElementById('panelBrandOther').value.trim() : panelBrandValue;
   const panelQty = document.getElementById('panelQty').value.trim();
   const panelWatt = document.getElementById('panelWatt').value.trim();
-  const inverterBrand = document.getElementById('inverterBrand').value.trim();
+  const inverterBrandValue = getRadioValue('inverterBrand');
+  const inverterBrand = inverterBrandValue === 'Other' ? document.getElementById('inverterBrandOther').value.trim() : inverterBrandValue;
   const note = document.getElementById('note').value.trim();
   const date = document.getElementById('date').value;
   const quotationId = createQuotationId('PSE-COM');
@@ -81,13 +85,14 @@ function buildCommercialQuotationData() {
         rate: formatINR(calc.reg),
         total: formatINR(calc.reg)
       },
-      {
-        description: 'Meter & other government charges',
-        detail: `Meter: ${formatINR(calc.meter)}\nOther government charges: ${formatINR(calc.other)}`,
-        qty: '1',
-        rate: formatINR(calc.meter + calc.other),
-        total: formatINR(calc.meter + calc.other)
-      }
+      ...(calc.meter > 0 ? [{
+        description: 'Meter Charge', detail: 'Meter charge entered for this client.', qty: '1',
+        rate: formatINR(calc.meter), total: formatINR(calc.meter)
+      }] : []),
+      ...(calc.structure > 0 ? [{
+        description: 'Structure Cost', detail: 'Structure cost entered for this client.', qty: '1',
+        rate: formatINR(calc.structure), total: formatINR(calc.structure)
+      }] : [])
     ],
 
     subTotal: formatINR(calc.total),
@@ -115,5 +120,7 @@ async function generatePDF() {
 document.addEventListener('DOMContentLoaded', () => {
   syncQuotationCreator();
   calcCommercial();
+  document.querySelectorAll('input[name="panelBrand"]').forEach(r => r.addEventListener('change', () => toggleOther('panelBrandOther')));
+  document.querySelectorAll('input[name="inverterBrand"]').forEach(r => r.addEventListener('change', () => toggleOther('inverterBrandOther')));
 });
 

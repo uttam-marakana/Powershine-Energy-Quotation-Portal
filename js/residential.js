@@ -102,16 +102,20 @@ function calcResidential() {
     ? parseFloat(document.getElementById('subsidyOther').value) || 0
     : parseFloat(subsidyValue) || 0;
 
-  const discom = parseFloat(document.getElementById('discomCharge').value) || 0;
+  const discom = Math.max(0, parseFloat(document.getElementById('discomCharge').value) || 0);
+  const structure = Math.max(0, parseFloat(document.getElementById('structureFees').value) || 0);
   // Subsidy is shown for reference only. The customer payable amount is the
   // quotation amount plus any entered DISCOM charge; subsidy is credited later.
-  const payable = Math.max(0, grand + discom);
+  const payable = Math.max(0, grand + discom + structure);
 
   document.getElementById('totalKW').value = totalKW ? totalKW.toFixed(2) : '';
   document.getElementById('sumKW').textContent = totalKW ? `${totalKW.toFixed(2)} kW` : '—';
   document.getElementById('sumGrand').textContent = formatINR(grand);
   document.getElementById('sumSubsidy').textContent = formatINR(subsidy);
   document.getElementById('sumDiscom').textContent = formatINR(discom);
+  document.getElementById('sumStructure').textContent = formatINR(structure);
+  document.getElementById('discomSummaryRow').hidden = discom <= 0;
+  document.getElementById('structureSummaryRow').hidden = structure <= 0;
   document.getElementById('sumPayable').textContent = formatINR(payable);
 
   return {
@@ -121,6 +125,7 @@ function calcResidential() {
     grand,
     subsidy,
     discom,
+    structure,
     payable
   };
 }
@@ -177,13 +182,16 @@ function buildResidentialQuotationData() {
           : formatINR(calc.grand),
         total: formatINR(calc.grand)
       },
-      {
+      ...(calc.discom > 0 ? [{
         description: 'DISCOM charge',
         detail: 'Government / DISCOM charge entered in the residential quotation.',
-        qty: '1',
-        rate: formatINR(calc.discom),
-        total: formatINR(calc.discom)
-      }
+        qty: '1', rate: formatINR(calc.discom), total: formatINR(calc.discom)
+      }] : []),
+      ...(calc.structure > 0 ? [{
+        description: 'Structure Fees',
+        detail: 'Structure fees entered in the residential quotation.',
+        qty: '1', rate: formatINR(calc.structure), total: formatINR(calc.structure)
+      }] : [])
     ],
 
     subTotal: formatINR(calc.payable),
@@ -191,7 +199,7 @@ function buildResidentialQuotationData() {
     tax: formatINR(0),
     grandTotal: formatINR(calc.payable),
     amountInWords: amountInWordsINR(calc.payable),
-    note: 'Residential quotation: subsidy is shown for reference and is credited to the customer account later. Customer payable is quotation amount plus applicable DISCOM charge.'
+    note: 'Residential quotation: subsidy is shown for reference and is credited to the customer account later. Customer payable includes the quotation amount and any applicable DISCOM charge and structure fees.'
   };
 }
 

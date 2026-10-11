@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 180" role="img" aria-labelledby="title desc">
+  <title id="title">PowerShine Energy</title>
+  <desc id="desc">PowerShine Energy logo with an orange sun and green energy accent.</desc>
+  <defs>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9b2f"/>
+      <stop offset="1" stop-color="#ef6517"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(18 18)">
+    <circle cx="72" cy="72" r="48" fill="none" stroke="url(#sun)" stroke-width="11"/>
+    <g stroke="#ef6517" stroke-width="7" stroke-linecap="round">
+      <path d="M72 4v-15"/><path d="M72 140v15"/><path d="M4 72h-15"/><path d="M140 72h15"/>
+      <path d="M24 24 13 13"/><path d="M120 120 131 131"/><path d="M120 24 131 13"/><path d="M24 120 13 131"/>
+    </g>
+    <path d="M53 78c8-20 24-31 48-31-7 14-17 27-31 35-8 4-14 3-17-4Z" fill="#78b843"/>
+    <circle cx="69" cy="64" r="5" fill="#78b843"/>
+  </g>
+  <text x="158" y="91" font-family="Arial, Helvetica, sans-serif" font-size="67" font-weight="800" fill="#ef6517" letter-spacing="-2">PowerShine</text>
+  <text x="500" y="143" font-family="Arial, Helvetica, sans-serif" font-size="39" font-weight="700" fill="#222">Energy</text>
+  <text x="159" y="156" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#6f9f43" letter-spacing="3">LET'S TRY SUN ENERGY</text>
+</svg>
