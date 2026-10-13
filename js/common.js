@@ -1,7 +1,4 @@
-// Common utilities for Powershine Energy Quotation Portal
-
-// Versioned URL prevents browsers/CDNs from reusing an older cached template.
-const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=32-20261013-1";
+const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=32-20261013";
 
 // Channel Partner Code: the "CP-" prefix is fixed; dealers only type what follows it.
 const CP_PREFIX = "CP-";
