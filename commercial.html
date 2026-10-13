@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   </head>
+
   <body>
     <header class="header">
       <div class="header-inner">
@@ -17,6 +18,7 @@
             alt="PowerShine Energy"
           />
         </a>
+
         <nav class="nav">
           <a href="index.html">Home</a>
           <a href="residential.html" target="_blank">Residential</a>
@@ -32,6 +34,7 @@
             Commercial / Industrial Solar Quotation · Powershine Energy Dealer
           </p>
         </div>
+
         <div class="form-body">
           <div class="alert alert-info">
             * Indicates required fields. System calculates total = (Inverter kW
@@ -40,16 +43,18 @@
           </div>
 
           <form id="commercialForm" onsubmit="return false;">
-            <!-- Customer -->
+            <!-- Customer Details -->
             <div class="section-title">Customer Details</div>
 
             <div class="form-group">
-              <label>Date <span class="req">*</span></label>
+              <label for="date">Date <span class="req">*</span></label>
               <input type="date" class="form-control" id="date" required />
             </div>
 
             <div class="form-group">
-              <label>NAME OF CUSTOMER <span class="req">*</span></label>
+              <label for="name">
+                NAME OF CUSTOMER <span class="req">*</span>
+              </label>
               <input
                 type="text"
                 class="form-control"
@@ -60,7 +65,7 @@
             </div>
 
             <div class="form-group">
-              <label>Business Name</label>
+              <label for="businessName">Business Name</label>
               <input
                 type="text"
                 class="form-control"
@@ -69,18 +74,10 @@
               />
             </div>
 
-            <!-- <div class="form-group">
-              <label>GST No</label>
-              <input
-                type="text"
-                class="form-control"
-                id="gstNo"
-                placeholder="GSTIN (if available)"
-              />
-            </div> -->
-
             <div class="form-group">
-              <label>Contact No <span class="req">*</span></label>
+              <label for="contactNo">
+                Contact No <span class="req">*</span>
+              </label>
               <input
                 type="tel"
                 class="form-control"
@@ -91,21 +88,23 @@
             </div>
 
             <div class="form-group">
-              <label>City <span class="req">*</span></label>
+              <label for="city">City <span class="req">*</span></label>
               <input
+                type="text"
                 class="form-control"
                 id="city"
-                type="text"
                 placeholder="Full installation city"
                 required
-              ></input>
+              />
             </div>
 
-            <!-- Plant -->
+            <!-- Plant and Panel Details -->
             <div class="section-title">Plant & Panel Details</div>
 
             <div class="form-group">
-              <label>Plant Size <span class="req">*</span></label>
+              <label for="plantSize">
+                Plant Size <span class="req">*</span>
+              </label>
               <input
                 type="text"
                 class="form-control"
@@ -116,7 +115,8 @@
             </div>
 
             <div class="form-group">
-              <label>Panel Brand <span class="req">*</span></label>
+              <label> Panel Brand <span class="req">*</span> </label>
+
               <div class="radio-group">
                 <div class="radio-item">
                   <input
@@ -124,79 +124,117 @@
                     name="panelBrand"
                     id="cpb_aps"
                     value="Aps"
-                    onchange="toggleOther('panelBrandOther')"
+                    onchange="
+                      toggleCommercialOther('panelBrandOther', 'panelBrand')
+                    "
                     required
-                  /><label for="cpb_aps">Aps</label>
+                  />
+                  <label for="cpb_aps">Aps</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="panelBrand"
                     id="cpb_waaree"
-                    value="Waaree" onchange="toggleOther('panelBrandOther')"
-                  /><label for="cpb_waaree">Waaree</label>
+                    value="Waaree"
+                    onchange="
+                      toggleCommercialOther('panelBrandOther', 'panelBrand')
+                    "
+                  />
+                  <label for="cpb_waaree">Waaree</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="panelBrand"
                     id="cpb_adani"
-                    value="Adani" onchange="toggleOther('panelBrandOther')"
-                  /><label for="cpb_adani">Adani</label>
+                    value="Adani"
+                    onchange="
+                      toggleCommercialOther('panelBrandOther', 'panelBrand')
+                    "
+                  />
+                  <label for="cpb_adani">Adani</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="panelBrand"
                     id="cpb_rayzon"
-                    value="Rayzon" onchange="toggleOther('panelBrandOther')"
-                  /><label for="cpb_rayzon">Rayzon</label>
+                    value="Rayzon"
+                    onchange="
+                      toggleCommercialOther('panelBrandOther', 'panelBrand')
+                    "
+                  />
+                  <label for="cpb_rayzon">Rayzon</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="panelBrand"
                     id="cpb_other"
-                    value="Other" onchange="toggleOther('panelBrandOther')"
-                  /><label for="cpb_other">Other</label>
+                    value="Other"
+                    onchange="
+                      toggleCommercialOther('panelBrandOther', 'panelBrand')
+                    "
+                  />
+                  <label for="cpb_other">Other</label>
                 </div>
               </div>
-              <input type="text" class="form-control other-input" id="panelBrandOther" placeholder="Enter panel brand" oninput="calcCommercial()" />
+
+              <input
+                type="text"
+                class="form-control other-input"
+                id="panelBrandOther"
+                style="display: none"
+                placeholder="Enter panel brand"
+                oninput="calcCommercial()"
+              />
             </div>
 
             <div class="form-group">
-              <label>Panel Quantity</label>
+              <label for="panelQty">Panel Quantity</label>
               <input
-                type="text"
+                type="number"
                 inputmode="numeric"
                 step="1"
+                min="0"
                 class="form-control"
                 id="panelQty"
-                min="0"
                 placeholder="Number of panels"
-                oninput="calcCommercial()"
+                oninput="
+                  this.value = this.value.replace(/[^0-9]/g, '');
+                  calcCommercial();
+                "
               />
             </div>
 
             <div class="form-group">
-              <label>Panel Watt</label>
+              <label for="panelWatt">Panel Watt</label>
               <input
-                type="text"
+                type="number"
                 inputmode="numeric"
                 step="1"
+                min="0"
                 class="form-control"
                 id="panelWatt"
-                min="0"
                 placeholder="Wattage per panel"
-                oninput="calcCommercial()"
+                oninput="
+                  this.value = this.value.replace(/[^0-9]/g, '');
+                  calcCommercial();
+                "
               />
             </div>
 
-            <!-- Inverter -->
+            <!-- Inverter and Pricing -->
             <div class="section-title">Inverter & Pricing</div>
 
             <div class="form-group">
-              <label>Inverter Brand <span class="req">*</span></label>
+              <label> Inverter Brand <span class="req">*</span> </label>
+
               <div class="radio-group">
                 <div class="radio-item">
                   <input
@@ -204,123 +242,184 @@
                     name="inverterBrand"
                     id="cib_rem"
                     value="Rem"
-                    onchange="toggleOther('inverterBrandOther')"
+                    onchange="
+                      toggleCommercialOther(
+                        'inverterBrandOther',
+                        'inverterBrand',
+                      )
+                    "
                     required
-                  /><label for="cib_rem">Rem</label>
+                  />
+                  <label for="cib_rem">Rem</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="inverterBrand"
                     id="cib_aps"
-                    value="Aps" onchange="toggleOther('inverterBrandOther')"
-                  /><label for="cib_aps">Aps</label>
+                    value="Aps"
+                    onchange="
+                      toggleCommercialOther(
+                        'inverterBrandOther',
+                        'inverterBrand',
+                      )
+                    "
+                  />
+                  <label for="cib_aps">Aps</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="inverterBrand"
                     id="cib_polycab"
-                    value="Polycab" onchange="toggleOther('inverterBrandOther')"
-                  /><label for="cib_polycab">Polycab</label>
+                    value="Polycab"
+                    onchange="
+                      toggleCommercialOther(
+                        'inverterBrandOther',
+                        'inverterBrand',
+                      )
+                    "
+                  />
+                  <label for="cib_polycab">Polycab</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="inverterBrand"
                     id="cib_solaryaan"
-                    value="Solaryaan" onchange="toggleOther('inverterBrandOther')"
-                  /><label for="cib_solaryaan">Solaryaan</label>
+                    value="Solaryaan"
+                    onchange="
+                      toggleCommercialOther(
+                        'inverterBrandOther',
+                        'inverterBrand',
+                      )
+                    "
+                  />
+                  <label for="cib_solaryaan">Solaryaan</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="inverterBrand"
                     id="cib_other"
-                    value="Other" onchange="toggleOther('inverterBrandOther')"
-                  /><label for="cib_other">Other</label>
+                    value="Other"
+                    onchange="
+                      toggleCommercialOther(
+                        'inverterBrandOther',
+                        'inverterBrand',
+                      )
+                    "
+                  />
+                  <label for="cib_other">Other</label>
                 </div>
               </div>
-              <input type="text" class="form-control other-input" id="inverterBrandOther" placeholder="Enter inverter brand" oninput="calcCommercial()" />
+
+              <input
+                type="text"
+                class="form-control other-input"
+                id="inverterBrandOther"
+                style="display: none"
+                placeholder="Enter inverter brand"
+                oninput="calcCommercial()"
+              />
             </div>
 
             <div class="form-group">
-              <label>Inverter kW</label>
+              <label for="inverterKW">Inverter kW</label>
               <input
-                type="text"
+                type="number"
                 class="form-control"
                 id="inverterKW"
                 step="0.01"
                 min="0"
+                inputmode="decimal"
                 placeholder="e.g. 50"
                 oninput="calcCommercial()"
               />
             </div>
 
-            <!-- <div class="form-group">
-              <label>Rate (Per kW) <span class="req">*</span></label>
+            <div class="form-group">
+              <label for="ratePerKW">
+                Rate (Per kW) <span class="req">*</span>
+              </label>
               <input
-                type="text"
+                type="number"
                 class="form-control"
                 id="ratePerKW"
                 min="0"
+                step="0.01"
+                inputmode="decimal"
                 placeholder="₹ per kW"
                 required
                 oninput="calcCommercial()"
               />
-            </div> -->
+            </div>
 
+            <!-- Registration Charges -->
             <div class="form-group">
-              <label>Registration Charges <span class="req">*</span></label>
+              <label> Registration Charges <span class="req">*</span> </label>
+
               <div class="radio-group">
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="regCharges"
+                    id="regChargeZero"
                     value="0"
                     checked
                     onchange="calcCommercial()"
-                  /><label>₹ 0</label>
+                  />
+                  <label for="regChargeZero">₹ 0</label>
                 </div>
+
                 <div class="radio-item">
                   <input
                     type="radio"
                     name="regCharges"
+                    id="regCharge12650"
                     value="12650"
                     onchange="calcCommercial()"
-                  /><label>₹ 12,650</label>
+                  />
+                  <label for="regCharge12650">₹ 12,650</label>
                 </div>
               </div>
             </div>
 
+            <!-- Optional Client Charges -->
             <div class="form-group">
-              <label>Meter Charge (₹)</label>
+              <label for="meterCharge">Meter Charge (₹)</label>
               <input
-                type="text"
+                type="number"
                 class="form-control"
                 id="meterCharge"
                 min="0"
                 step="0.01"
+                inputmode="decimal"
                 placeholder="Leave blank if not applicable"
                 oninput="calcCommercial()"
               />
             </div>
 
             <div class="form-group">
-              <label>Structure Cost (₹)</label>
+              <label for="structureCost">Structure Cost (₹)</label>
               <input
-                type="text"
+                type="number"
                 class="form-control"
                 id="structureCost"
                 min="0"
                 step="0.01"
+                inputmode="decimal"
                 placeholder="Leave blank if not applicable"
                 oninput="calcCommercial()"
               />
             </div>
 
             <div class="form-group">
-              <label>Note <span class="req">*</span></label>
+              <label for="note">Note <span class="req">*</span></label>
               <textarea
                 class="form-control"
                 id="note"
@@ -330,34 +429,49 @@
               ></textarea>
             </div>
 
-            <!-- Summary -->
+            <!-- Quotation Summary -->
             <div class="calc-box" id="calcSummary">
-              <h3>📊 Quotation Summary</h3>
+              <h3>Quotation Summary</h3>
+
               <div class="calc-row">
-                <span>Inverter Capacity</span><span id="sumKW">—</span>
+                <span>Inverter Capacity</span>
+                <span id="sumKW">—</span>
               </div>
+
               <div class="calc-row">
-                <span>Rate × kW</span><span id="sumBase">—</span>
+                <span>Rate × kW</span>
+                <span id="sumBase">—</span>
               </div>
+
               <div class="calc-row">
-                <span>Registration</span><span id="sumReg">—</span>
+                <span>Registration</span>
+                <span id="sumReg">—</span>
               </div>
+
               <div class="calc-row" id="meterSummaryRow" hidden>
-                <span>Meter Charge</span><span id="sumMeter">—</span>
+                <span>Meter Charge</span>
+                <span id="sumMeter">—</span>
               </div>
+
               <div class="calc-row" id="structureSummaryRow" hidden>
-                <span>Structure Cost</span><span id="sumStructure">—</span>
+                <span>Structure Cost</span>
+                <span id="sumStructure">—</span>
               </div>
+
               <div class="calc-row total">
-                <span>Grand Total</span><span id="sumTotal">—</span>
+                <span>Grand Total</span>
+                <span id="sumTotal">—</span>
               </div>
             </div>
-            <!-- Creator -->
+
+            <!-- Quotation Creator -->
             <div class="section-title">Quotation Creator</div>
 
             <div class="creator-auto-grid">
               <div class="form-group">
-                <label>Quotation Creator Name <span class="req">*</span></label>
+                <label for="creatorDisplayName">
+                  Quotation Creator Name <span class="req">*</span>
+                </label>
                 <input
                   type="text"
                   class="form-control"
@@ -368,16 +482,16 @@
               </div>
 
               <div class="form-group">
-                <label
-                  >Quotation Creator Mobile <span class="req">*</span></label
-                >
+                <label for="creatorDisplayMobile">
+                  Quotation Creator Mobile <span class="req">*</span>
+                </label>
                 <input
                   type="tel"
                   class="form-control"
                   id="creatorDisplayMobile"
                   placeholder="Enter quotation creator mobile"
                   inputmode="numeric"
-                  pattern="[0-9+()\- ]{10,15}"
+                  pattern="[0-9+ \(\)\-]{10,15}"
                   required
                 />
               </div>
@@ -391,31 +505,38 @@
                   value="CP-"
                   placeholder="CP-001"
                   autocomplete="off"
+                  spellcheck="false"
+                  maxlength="20"
                 />
               </div>
             </div>
 
+            <!-- Actions -->
             <div class="form-actions">
               <button
                 type="button"
                 class="btn btn-primary"
                 onclick="calcCommercial()"
               >
-                🔄 Recalculate
+                Recalculate
               </button>
+
               <button
                 type="button"
                 class="btn btn-success"
                 onclick="generatePDF()"
               >
-                📄 Generate PDF & Preview
+                Generate PDF & Preview
               </button>
+
               <button
                 type="button"
                 class="btn btn-outline"
                 onclick="
                   document.getElementById('commercialForm').reset();
                   syncQuotationCreator();
+                  toggleCommercialOther('panelBrandOther', 'panelBrand');
+                  toggleCommercialOther('inverterBrandOther', 'inverterBrand');
                   calcCommercial();
                 "
               >
