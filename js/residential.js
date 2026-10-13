@@ -1,22 +1,21 @@
-
 // Panel wattage is intentionally the only dependent dropdown.
 // Panel Brand and Panel Type remain radio-button fields.
 const PANEL_WATT_RANGES = {
   Aps: {
     Bifacial: { min: 550, max: 550 },
-    Topcon: { min: 600, max: 600 }
+    Topcon: { min: 600, max: 600 },
   },
   Waaree: {
     Bifacial: { min: 530, max: 540 },
-    Topcon: { min: 580, max: 610 }
+    Topcon: { min: 580, max: 610 },
   },
   Adani: {
     Bifacial: { min: 550, max: 555 },
-    Topcon: { min: 610, max: 620 }
+    Topcon: { min: 610, max: 620 },
   },
   Solarium: {
-    Topcon: { min: 720, max: 720 }
-  }
+    Topcon: { min: 720, max: 720 },
+  },
 };
 
 const PANEL_WATT_STEP = 5;
@@ -27,34 +26,37 @@ function buildPanelWattOptions(range) {
   for (let watt = range.min; watt <= range.max; watt += PANEL_WATT_STEP) {
     values.push(watt);
   }
-  if (values.length && values[values.length - 1] !== range.max && range.max > values[values.length - 1]) {
+  if (
+    values.length &&
+    values[values.length - 1] !== range.max &&
+    range.max > values[values.length - 1]
+  ) {
     values.push(range.max);
   }
   return values;
 }
 
-
 function updatePanelWattOptions() {
-  const panelWatt = document.getElementById('panelWatt');
+  const panelWatt = document.getElementById("panelWatt");
   if (!panelWatt) return;
 
-  const brand = getRadioValue('panelBrand');
-  const panelType = getRadioValue('panelType');
+  const brand = getRadioValue("panelBrand");
+  const panelType = getRadioValue("panelType");
   const range = PANEL_WATT_RANGES[brand]?.[panelType];
   const options = buildPanelWattOptions(range);
   const previousValue = panelWatt.value;
 
-  panelWatt.innerHTML = '';
+  panelWatt.innerHTML = "";
 
-  const placeholder = document.createElement('option');
-  placeholder.value = '';
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
   placeholder.textContent = options.length
-    ? 'Select panel watt'
-    : 'No wattage available for this combination';
+    ? "Select panel watt"
+    : "No wattage available for this combination";
   panelWatt.appendChild(placeholder);
 
   options.forEach((watt) => {
-    const option = document.createElement('option');
+    const option = document.createElement("option");
     option.value = String(watt);
     option.textContent = `${watt} W`;
     panelWatt.appendChild(option);
@@ -65,58 +67,66 @@ function updatePanelWattOptions() {
   if (options.includes(Number(previousValue))) {
     panelWatt.value = previousValue;
   } else {
-    panelWatt.value = '';
+    panelWatt.value = "";
   }
 
   calcResidential();
 }
 
 function getPanelBrand() {
-  const value = getRadioValue('panelBrand');
-  if (value === 'Other') {
-    return document.getElementById('panelBrandOther').value.trim() || 'Other';
+  const value = getRadioValue("panelBrand");
+  if (value === "Other") {
+    return document.getElementById("panelBrandOther").value.trim() || "Other";
   }
-  return value || '—';
+  return value || "—";
 }
 
 function getInvBrand() {
-  const value = getRadioValue('invBrand');
-  if (value === 'Other') {
-    return document.getElementById('invBrandOther').value.trim() || 'Other';
+  const value = getRadioValue("invBrand");
+  if (value === "Other") {
+    return document.getElementById("invBrandOther").value.trim() || "Other";
   }
-  return value || '—';
+  return value || "—";
 }
 
 function calcResidential() {
-  const noOfPanel = parseFloat(document.getElementById('noOfPanel').value) || 0;
-  const panelWatt = parseFloat(document.getElementById('panelWatt').value) || 0;
-  const enteredKW = parseFloat(document.getElementById('totalKW').value) || 0;
+  const noOfPanel = parseFloat(document.getElementById("noOfPanel").value) || 0;
+  const panelWatt = parseFloat(document.getElementById("panelWatt").value) || 0;
+  const enteredKW = parseFloat(document.getElementById("totalKW").value) || 0;
 
-  const totalKW = noOfPanel && panelWatt
-    ? (noOfPanel * panelWatt) / 1000
-    : enteredKW;
+  const totalKW =
+    noOfPanel && panelWatt ? (noOfPanel * panelWatt) / 1000 : enteredKW;
 
-  const grand = parseFloat(document.getElementById('grandTotal').value) || 0;
-  const subsidyValue = getRadioValue('subsidy');
-  const subsidy = subsidyValue === 'Other'
-    ? parseFloat(document.getElementById('subsidyOther').value) || 0
-    : parseFloat(subsidyValue) || 0;
+  const grand = parseFloat(document.getElementById("grandTotal").value) || 0;
+  const subsidyValue = getRadioValue("subsidy");
+  const subsidy =
+    subsidyValue === "Other"
+      ? parseFloat(document.getElementById("subsidyOther").value) || 0
+      : parseFloat(subsidyValue) || 0;
 
-  const discom = Math.max(0, parseFloat(document.getElementById('discomCharge').value) || 0);
-  const structure = Math.max(0, parseFloat(document.getElementById('structureFees').value) || 0);
+  const discom = Math.max(
+    0,
+    parseFloat(document.getElementById("discomCharge").value) || 0,
+  );
+  const structure = Math.max(
+    0,
+    parseFloat(document.getElementById("structureFees").value) || 0,
+  );
   // Subsidy is shown for reference only. The customer payable amount is the
   // quotation amount plus any entered DISCOM charge; subsidy is credited later.
   const payable = Math.max(0, grand + discom + structure);
 
-  document.getElementById('totalKW').value = totalKW ? totalKW.toFixed(2) : '';
-  document.getElementById('sumKW').textContent = totalKW ? `${totalKW.toFixed(2)} kW` : '—';
-  document.getElementById('sumGrand').textContent = formatINR(grand);
-  document.getElementById('sumSubsidy').textContent = formatINR(subsidy);
-  document.getElementById('sumDiscom').textContent = formatINR(discom);
-  document.getElementById('sumStructure').textContent = formatINR(structure);
-  document.getElementById('discomSummaryRow').hidden = discom <= 0;
-  document.getElementById('structureSummaryRow').hidden = structure <= 0;
-  document.getElementById('sumPayable').textContent = formatINR(payable);
+  document.getElementById("totalKW").value = totalKW ? totalKW.toFixed(2) : "";
+  document.getElementById("sumKW").textContent = totalKW
+    ? `${totalKW.toFixed(2)} kW`
+    : "—";
+  document.getElementById("sumGrand").textContent = formatINR(grand);
+  document.getElementById("sumSubsidy").textContent = formatINR(subsidy);
+  document.getElementById("sumDiscom").textContent = formatINR(discom);
+  document.getElementById("sumStructure").textContent = formatINR(structure);
+  document.getElementById("discomSummaryRow").hidden = discom <= 0;
+  document.getElementById("structureSummaryRow").hidden = structure <= 0;
+  document.getElementById("sumPayable").textContent = formatINR(payable);
 
   return {
     noOfPanel,
@@ -126,72 +136,87 @@ function calcResidential() {
     subsidy,
     discom,
     structure,
-    payable
+    payable,
   };
 }
 
 function buildResidentialQuotationData() {
   const calc = calcResidential();
-  const customerName = document.getElementById('name').value.trim();
-  const city = document.getElementById('city').value.trim();
-  const date = document.getElementById('date').value;
+  const customerName = document.getElementById("name").value.trim();
+  const city = document.getElementById("city").value.trim();
+  const date = document.getElementById("date").value;
   const panelBrand = getPanelBrand();
-  const panelType = getRadioValue('panelType') || '—';
+  const panelType = getRadioValue("panelType") || "—";
   const inverterBrand = getInvBrand();
-  const quotationId = createQuotationId('PSE-RES');
+  const quotationId = createQuotationId("PSE-RES");
 
   return {
-    type: 'Residential',
+    type: "Residential",
     quotationId,
     date,
     expiryDate: addDaysToDate(date, 5),
 
     customerName,
-    customerBusinessName: '',
-    customerGst: '',
+    customerBusinessName: "",
+    customerGst: "",
     customerAddress: city,
     city,
-    mobile: document.getElementById('mobile').value.trim(),
-    contactNo: document.getElementById('mobile').value.trim(),
+    mobile: document.getElementById("mobile").value.trim(),
+    contactNo: document.getElementById("mobile").value.trim(),
     coverLocation: city,
 
-    createdBy: document.getElementById('creatorDisplayName').value.trim(),
-    creatorMobile: document.getElementById('creatorDisplayMobile').value.trim(),
-    channelPartnerCode: document.getElementById('channelPartnerCode')?.value.trim() || '',
+    createdBy: document.getElementById("creatorDisplayName").value.trim(),
+    creatorMobile: document.getElementById("creatorDisplayMobile").value.trim(),
+    channelPartnerCode:
+      document.getElementById("channelPartnerCode")?.value.trim() || "",
 
-    capacity: calc.totalKW ? `${calc.totalKW.toFixed(2)} kW` : '—',
+    capacity: calc.totalKW ? `${calc.totalKW.toFixed(2)} kW` : "—",
 
-    companyName: 'POWERSHINE ENERGY',
-    companyAddress: 'A-502, 9 Square Decora, Nana Mauva Road, Near Marwadi Building, Nana Mauva Circle, Rajkot - 360001, Gujarat - 360004, India',
-    companyGst: '24AAXFP3293M1ZE',
+    companyName: "POWERSHINE ENERGY",
+    companyAddress:
+      "A-502, 9 Square Decora, Nana Mauva Road, Near Marwadi Building, Nana Mauva Circle, Rajkot - 360001, Gujarat - 360004, India",
+    companyGst: "24AAXFP3293M1ZE",
 
     rows: [
       {
-        description: 'Solar power generating system',
+        description: "Solar power generating system",
         detail: [
           `Panel brand & type: ${panelBrand} / ${panelType}`,
-          `Panel quantity: ${calc.noOfPanel || '—'}`,
-          `Panel watt: ${calc.panelWatt ? `${calc.panelWatt} W` : '—'}`,
-          `System size: ${calc.totalKW ? `${calc.totalKW.toFixed(2)} kW` : '—'}`,
+          `Panel quantity: ${calc.noOfPanel || "—"}`,
+          `Panel watt: ${calc.panelWatt ? `${calc.panelWatt} W` : "—"}`,
+          `System size: ${calc.totalKW ? `${calc.totalKW.toFixed(2)} kW` : "—"}`,
           `Inverter brand: ${inverterBrand}`,
-          `Subsidy: ${formatINR(calc.subsidy)}`
-        ].join('\n'),
-        qty: calc.totalKW ? `${calc.totalKW.toFixed(2)} kW` : '1',
+          `Subsidy: ${formatINR(calc.subsidy)}`,
+        ].join("\n"),
+        qty: calc.totalKW ? `${calc.totalKW.toFixed(2)} kW` : "1",
         rate: calc.totalKW
           ? formatINR(calc.grand / calc.totalKW)
           : formatINR(calc.grand),
-        total: formatINR(calc.grand)
+        total: formatINR(calc.grand),
       },
-      ...(calc.discom > 0 ? [{
-        description: 'DISCOM charge',
-        detail: 'Government / DISCOM charge entered in the residential quotation.',
-        qty: '1', rate: formatINR(calc.discom), total: formatINR(calc.discom)
-      }] : []),
-      ...(calc.structure > 0 ? [{
-        description: 'Structure Fees',
-        detail: 'Structure fees entered in the residential quotation.',
-        qty: '1', rate: formatINR(calc.structure), total: formatINR(calc.structure)
-      }] : [])
+      ...(calc.discom > 0
+        ? [
+            {
+              description: "DISCOM charge",
+              detail:
+                "Government / DISCOM charge entered in the residential quotation.",
+              qty: "1",
+              rate: formatINR(calc.discom),
+              total: formatINR(calc.discom),
+            },
+          ]
+        : []),
+      ...(calc.structure > 0
+        ? [
+            {
+              description: "Structure Fees",
+              detail: "Structure fees entered in the residential quotation.",
+              qty: "1",
+              rate: formatINR(calc.structure),
+              total: formatINR(calc.structure),
+            },
+          ]
+        : []),
     ],
 
     subTotal: formatINR(calc.payable),
@@ -199,44 +224,47 @@ function buildResidentialQuotationData() {
     tax: formatINR(0),
     grandTotal: formatINR(calc.payable),
     amountInWords: amountInWordsINR(calc.payable),
-    note: 'Residential quotation: subsidy is shown for reference and is credited to the customer account later. Customer payable includes the quotation amount and any applicable DISCOM charge and structure fees.'
+    note: "Residential quotation: subsidy is shown for reference and is credited to the customer account later. Customer payable includes the quotation amount and any applicable DISCOM charge and structure fees.",
   };
 }
 
 async function generatePDF() {
-  const form = document.getElementById('residentialForm');
+  const form = document.getElementById("residentialForm");
 
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
   }
 
+  if (!validateChannelPartnerCode()) return;
+
   const data = buildResidentialQuotationData();
   const fileName = `Residential_Quote_${sanitizeFileName(data.customerName)}_${data.date}.pdf`;
   await generateAndPreviewTemplatePDF(data, fileName);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   syncQuotationCreator();
 
   calcResidential();
 
-  const panelCount = document.getElementById('noOfPanel');
-  const panelWatt = document.getElementById('panelWatt');
+  const panelCount = document.getElementById("noOfPanel");
+  const panelWatt = document.getElementById("panelWatt");
 
   function syncSystemKW() {
     const no = parseFloat(panelCount.value) || 0;
     const watt = parseFloat(panelWatt.value) || 0;
 
     if (no && watt) {
-      document.getElementById('totalKW').value = ((no * watt) / 1000).toFixed(2);
+      document.getElementById("totalKW").value = ((no * watt) / 1000).toFixed(
+        2,
+      );
     }
 
     calcResidential();
   }
 
-  panelCount.addEventListener('input', syncSystemKW);
-  panelWatt.addEventListener('change', syncSystemKW);
+  panelCount.addEventListener("input", syncSystemKW);
+  panelWatt.addEventListener("change", syncSystemKW);
   updatePanelWattOptions();
 });
-
