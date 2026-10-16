@@ -1,11 +1,14 @@
 function readNumber(id) {
-  const el = document.getElementById(id);
-  if (!el) return 0;
+  const element = document.getElementById(id);
 
-  const raw = String(el.value ?? "").trim();
-  if (!raw) return 0;
+  if (!element) return 0;
 
-  const value = Number(raw);
+  const rawValue = String(element.value ?? "").trim();
+
+  if (!rawValue) return 0;
+
+  const value = Number(rawValue);
+
   return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
@@ -14,48 +17,63 @@ function readText(id) {
 }
 
 function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value;
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.textContent = value;
+  }
 }
 
 function toggleCommercialOther(inputId, radioName) {
   const input = document.getElementById(inputId);
+
   if (!input) return;
 
-  const show = getRadioValue(radioName) === "Other";
+  const selectedBrand = getRadioValue(radioName);
+  const showInput = selectedBrand === "Other";
 
-  input.style.display = show ? "block" : "none";
-  input.required = show;
+  input.style.display = showInput ? "block" : "none";
+  input.required = showInput;
 
-  if (!show) {
+  if (!showInput) {
     input.value = "";
   }
 }
 
 function calcCommercial() {
+  // Inverter kW determines the base price.
+  // Panel wattage and panel quantity are informational only.
+
   const invKW = readNumber("inverterKW");
   const rate = readNumber("ratePerKW");
 
   const base = invKW * rate;
+
   const reg = Math.max(0, Number(getRadioValue("regCharges")) || 0);
+
   const meter = readNumber("meterCharge");
   const structure = readNumber("structureCost");
 
   const total = base + reg + meter + structure;
 
-  setText("sumKW", invKW ? `${invKW.toFixed(2)} kW` : "—");
+  setText("sumKW", invKW > 0 ? `${invKW.toFixed(2)} kW` : "—");
+
   setText("sumBase", formatINR(base));
   setText("sumReg", formatINR(reg));
   setText("sumMeter", formatINR(meter));
   setText("sumStructure", formatINR(structure));
+  setText("sumTotal", formatINR(total));
 
   const meterRow = document.getElementById("meterSummaryRow");
   const structureRow = document.getElementById("structureSummaryRow");
 
-  if (meterRow) meterRow.hidden = meter <= 0;
-  if (structureRow) structureRow.hidden = structure <= 0;
+  if (meterRow) {
+    meterRow.hidden = meter <= 0;
+  }
 
-  setText("sumTotal", formatINR(total));
+  if (structureRow) {
+    structureRow.hidden = structure <= 0;
+  }
 
   return {
     invKW,
@@ -78,6 +96,7 @@ function buildCommercialQuotationData() {
   const plantSize = readText("plantSize");
 
   const panelBrandValue = getRadioValue("panelBrand");
+
   const panelBrand =
     panelBrandValue === "Other" ? readText("panelBrandOther") : panelBrandValue;
 
@@ -85,6 +104,7 @@ function buildCommercialQuotationData() {
   const panelWatt = readText("panelWatt");
 
   const inverterBrandValue = getRadioValue("inverterBrand");
+
   const inverterBrand =
     inverterBrandValue === "Other"
       ? readText("inverterBrandOther")
@@ -92,27 +112,41 @@ function buildCommercialQuotationData() {
 
   const note = readText("note");
   const date = readText("date");
+
   const quotationId = createQuotationId("PSE-COM");
+
+  // These details are included for information only.
+  // They do not calculate or change inverter capacity.
+  const systemDetails = [
+    `Plant size: ${plantSize || "—"}`,
+    `Panel brand: ${panelBrand || "—"}`,
+    `Panel quantity: ${panelQty || "—"}`,
+    `Panel watt: ${panelWatt ? `${panelWatt} W` : "—"}`,
+    `Inverter brand: ${inverterBrand || "—"}`,
+    `Inverter capacity: ${
+      calc.invKW > 0 ? `${calc.invKW.toFixed(2)} kW` : "—"
+    }`,
+  ].join("\n");
 
   const rows = [
     {
-      description: "Solar power generating system",
-      detail: [
-        `Plant size: ${plantSize || "—"}`,
-        `Panel brand: ${panelBrand || "—"}`,
-        `Panel quantity: ${panelQty || "—"}`,
-        `Panel watt: ${panelWatt ? `${panelWatt} W` : "—"}`,
-        `Inverter: ${inverterBrand || "—"}`,
-        `Inverter capacity: ${
-          calc.invKW ? `${calc.invKW.toFixed(2)} kW` : "—"
-        }`,
-      ].join("\n"),
-      qty: calc.invKW ? `${calc.invKW.toFixed(2)} kW` : "1",
+      description: "System Details (Information Only)",
+      detail: systemDetails,
+      qty: "—",
+      rate: "—",
+      total: "—",
+    },
+    {
+      description: "Inverter Pricing (Rate × kW)",
+      detail:
+        `Inverter capacity ${calc.invKW.toFixed(2)} kW × ` +
+        `rate ${formatINR(calc.rate)} per kW.`,
+      qty: `${calc.invKW.toFixed(2)} kW`,
       rate: formatINR(calc.rate),
       total: formatINR(calc.base),
     },
     {
-      description: "Registration charges",
+      description: "Registration Charges",
       detail: "Registration charges selected in the commercial quotation.",
       qty: "1",
       rate: formatINR(calc.reg),
@@ -120,6 +154,7 @@ function buildCommercialQuotationData() {
     },
   ];
 
+  // Include optional charges only when greater than zero.
   if (calc.meter > 0) {
     rows.push({
       description: "Meter Charge",
@@ -160,11 +195,15 @@ function buildCommercialQuotationData() {
     creatorMobile: readText("creatorDisplayMobile"),
     channelPartnerCode: readText("channelPartnerCode"),
 
-    capacity: plantSize || (calc.invKW ? `${calc.invKW.toFixed(2)} kW` : "—"),
+    capacity:
+      plantSize || (calc.invKW > 0 ? `${calc.invKW.toFixed(2)} kW` : "—"),
 
     companyName: "POWERSHINE ENERGY",
+
     companyAddress:
-      "A-502, 9 Square Decora, Nana Mauva Road, Near Marwadi Building, Nana Mauva Circle, Rajkot - 360001, Gujarat - 360004, India",
+      "A-502, 9 Square Decora, Nana Mauva Road, Near Marwadi Building, " +
+      "Nana Mauva Circle, Rajkot - 360001, Gujarat - 360004, India",
+
     companyGst: "24AAXFP3293M1ZE",
 
     rows,
@@ -215,10 +254,21 @@ async function generatePDF() {
 
   const fileName = `Commercial_Quote_${sanitizeFileName(data.customerName)}_${data.date}.pdf`;
 
-  await generateAndPreviewTemplatePDF(data, fileName);
+  try {
+    await generateAndPreviewTemplatePDF(data, fileName);
+  } catch (error) {
+    console.error("Failed to generate the commercial quotation PDF:", error);
+    alert(
+      "Unable to generate the quotation PDF. Check the console for details.",
+    );
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("commercialForm");
+
+  if (!form) return;
+
   if (typeof syncQuotationCreator === "function") {
     syncQuotationCreator();
   }
@@ -240,15 +290,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document
-    .querySelectorAll('#commercialForm input[type="number"]')
-    .forEach((input) => {
-      input.addEventListener("input", () => {
-        if (input.value !== "" && Number(input.value) < 0) {
-          input.value = "0";
-        }
+  // Recalculate when pricing or optional charges change.
+  ["inverterKW", "ratePerKW", "meterCharge", "structureCost"].forEach((id) => {
+    document.getElementById(id)?.addEventListener("input", calcCommercial);
+  });
 
-        calcCommercial();
-      });
-    });
+  document.querySelectorAll('input[name="regCharges"]').forEach((radio) => {
+    radio.addEventListener("change", calcCommercial);
+  });
+
+  document
+    .getElementById("recalculateBtn")
+    ?.addEventListener("click", calcCommercial);
+
+  document
+    .getElementById("generatePdfBtn")
+    ?.addEventListener("click", generatePDF);
+
+  form.addEventListener("reset", () => {
+    // Reset runs before browser controls have completed their reset.
+    setTimeout(() => {
+      toggleCommercialOther("panelBrandOther", "panelBrand");
+      toggleCommercialOther("inverterBrandOther", "inverterBrand");
+
+      if (typeof syncQuotationCreator === "function") {
+        syncQuotationCreator();
+      }
+
+      calcCommercial();
+    }, 0);
+  });
 });

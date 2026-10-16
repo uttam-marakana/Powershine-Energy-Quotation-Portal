@@ -37,13 +37,13 @@
 
         <div class="form-body">
           <div class="alert alert-info">
-            * Indicates required fields. System calculates total = (Inverter kW
-            × Rate) + charges. Click Generate PDF & Preview to review the
-            generated PDF before downloading.
+            Plant and panel values are for information only. Enter Inverter kW
+            directly; it is not calculated from panel wattage. The total
+            includes the base price, registration charges, and any applicable
+            Meter Charge or Structure Cost.
           </div>
 
           <form id="commercialForm" onsubmit="return false;">
-            <!-- Customer Details -->
             <div class="section-title">Customer Details</div>
 
             <div class="form-group">
@@ -98,7 +98,6 @@
               />
             </div>
 
-            <!-- Plant and Panel Details -->
             <div class="section-title">Plant & Panel Details</div>
 
             <div class="form-group">
@@ -115,7 +114,7 @@
             </div>
 
             <div class="form-group">
-              <label> Panel Brand <span class="req">*</span> </label>
+              <label>Panel Brand <span class="req">*</span></label>
 
               <div class="radio-group">
                 <div class="radio-item">
@@ -191,7 +190,6 @@
                 id="panelBrandOther"
                 style="display: none"
                 placeholder="Enter panel brand"
-                oninput="calcCommercial()"
               />
             </div>
 
@@ -199,16 +197,12 @@
               <label for="panelQty">Panel Quantity</label>
               <input
                 type="tel"
-                inputmode="numeric"
-                step="1"
-                min="0"
                 class="form-control"
                 id="panelQty"
+                min="0"
+                step="1"
+                inputmode="numeric"
                 placeholder="Number of panels"
-                oninput="
-                  this.value = this.value.replace(/[^0-9]/g, '');
-                  calcCommercial();
-                "
               />
             </div>
 
@@ -216,24 +210,19 @@
               <label for="panelWatt">Panel Watt</label>
               <input
                 type="tel"
-                inputmode="numeric"
-                step="1"
-                min="0"
                 class="form-control"
                 id="panelWatt"
+                min="0"
+                step="1"
+                inputmode="numeric"
                 placeholder="Wattage per panel"
-                oninput="
-                  this.value = this.value.replace(/[^0-9]/g, '');
-                  calcCommercial();
-                "
               />
             </div>
 
-            <!-- Inverter and Pricing -->
             <div class="section-title">Inverter & Pricing</div>
 
             <div class="form-group">
-              <label> Inverter Brand <span class="req">*</span> </label>
+              <label>Inverter Brand <span class="req">*</span></label>
 
               <div class="radio-group">
                 <div class="radio-item">
@@ -324,21 +313,22 @@
                 id="inverterBrandOther"
                 style="display: none"
                 placeholder="Enter inverter brand"
-                oninput="calcCommercial()"
               />
             </div>
 
             <div class="form-group">
-              <label for="inverterKW">Inverter kW</label>
+              <label for="inverterKW">
+                Inverter kW <span class="req">*</span>
+              </label>
               <input
                 type="tel"
                 class="form-control"
                 id="inverterKW"
+                min="0.01"
                 step="0.01"
-                min="0"
                 inputmode="decimal"
                 placeholder="e.g. 50"
-                oninput="calcCommercial()"
+                required
               />
             </div>
 
@@ -355,13 +345,11 @@
                 inputmode="decimal"
                 placeholder="₹ per kW"
                 required
-                oninput="calcCommercial()"
               />
             </div>
 
-            <!-- Registration Charges -->
             <div class="form-group">
-              <label> Registration Charges <span class="req">*</span> </label>
+              <label>Registration Charges <span class="req">*</span></label>
 
               <div class="radio-group">
                 <div class="radio-item">
@@ -371,7 +359,6 @@
                     id="regChargeZero"
                     value="0"
                     checked
-                    onchange="calcCommercial()"
                   />
                   <label for="regChargeZero">₹ 0</label>
                 </div>
@@ -382,14 +369,12 @@
                     name="regCharges"
                     id="regCharge12650"
                     value="12650"
-                    onchange="calcCommercial()"
                   />
                   <label for="regCharge12650">₹ 12,650</label>
                 </div>
               </div>
             </div>
 
-            <!-- Optional Client Charges -->
             <div class="form-group">
               <label for="meterCharge">Meter Charge (₹)</label>
               <input
@@ -400,7 +385,6 @@
                 step="0.01"
                 inputmode="decimal"
                 placeholder="Leave blank if not applicable"
-                oninput="calcCommercial()"
               />
             </div>
 
@@ -414,7 +398,6 @@
                 step="0.01"
                 inputmode="decimal"
                 placeholder="Leave blank if not applicable"
-                oninput="calcCommercial()"
               />
             </div>
 
@@ -428,7 +411,6 @@
               ></textarea>
             </div>
 
-            <!-- Quotation Summary -->
             <div class="calc-box" id="calcSummary">
               <h3>Quotation Summary</h3>
 
@@ -438,7 +420,7 @@
               </div>
 
               <div class="calc-row">
-                <span>Grand Total</span>
+                <span>Rate × kW</span>
                 <span id="sumBase">—</span>
               </div>
 
@@ -458,12 +440,11 @@
               </div>
 
               <div class="calc-row total">
-                <span>Total Payable Amount</span>
+                <span>Grand Total</span>
                 <span id="sumTotal">—</span>
               </div>
             </div>
 
-            <!-- Quotation Creator -->
             <div class="section-title">Quotation Creator</div>
 
             <div class="creator-auto-grid">
@@ -510,35 +491,16 @@
               </div>
             </div>
 
-            <!-- Actions -->
             <div class="form-actions">
-              <button
-                type="button"
-                class="btn btn-primary"
-                onclick="calcCommercial()"
-              >
+              <button type="button" class="btn btn-primary" id="recalculateBtn">
                 Recalculate
               </button>
 
-              <button
-                type="button"
-                class="btn btn-success"
-                onclick="generatePDF()"
-              >
+              <button type="button" class="btn btn-success" id="generatePdfBtn">
                 Generate PDF & Preview
               </button>
 
-              <button
-                type="button"
-                class="btn btn-outline"
-                onclick="
-                  document.getElementById('commercialForm').reset();
-                  syncQuotationCreator();
-                  toggleCommercialOther('panelBrandOther', 'panelBrand');
-                  toggleCommercialOther('inverterBrandOther', 'inverterBrand');
-                  calcCommercial();
-                "
-              >
+              <button type="reset" class="btn btn-outline" id="clearFormBtn">
                 Clear Form
               </button>
             </div>
