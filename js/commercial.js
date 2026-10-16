@@ -137,7 +137,7 @@ function buildCommercialQuotationData() {
       total: "—",
     },
     {
-      description: "Inverter Pricing (Rate × kW)",
+      description: "Grand Total",
       detail:
         `Inverter capacity ${calc.invKW.toFixed(2)} kW × ` +
         `rate ${formatINR(calc.rate)} per kW.`,
