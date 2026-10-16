@@ -390,7 +390,7 @@
 
           <div class="form-group">
             <label>Rate (Per kW) <span class="req">*</span></label>
-            <input type="number" class="form-control" id="ratePerKW" min="0" placeholder="₹ per kW" required oninput="calcCommercial()">
+            <input type="number" class="form-control" id="grandTotal" min="0" placeholder="₹ per kW" required oninput="calcCommercial()">
           </div>
 
           <div class="form-group">
@@ -2265,7 +2265,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ```javascript
 function calcCommercial() {
   const invKW = parseFloat(document.getElementById('inverterKW').value) || 0;
-  const rate = parseFloat(document.getElementById('ratePerKW').value) || 0;
+  const rate = parseFloat(document.getElementById('grandTotal').value) || 0;
   const base = invKW * rate;
 
   const reg = parseFloat(getRadioValue('regCharges')) || 0;

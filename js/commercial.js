@@ -41,11 +41,9 @@ function toggleCommercialOther(inputId, radioName) {
 }
 
 function calcCommercial() {
-  // Inverter kW determines the base price.
-  // Panel wattage and panel quantity are informational only.
 
   const invKW = readNumber("inverterKW");
-  const rate = readNumber("ratePerKW");
+  const rate = readNumber("grandTotal");
 
   const base = invKW * rate;
 
@@ -118,7 +116,7 @@ function buildCommercialQuotationData() {
   // These details are included for information only.
   // They do not calculate or change inverter capacity.
   const systemDetails = [
-    `Plant size: ${plantSize || "—"}`,
+    `Plant size: ${plantSize || "—"} kW`,
     `Panel brand: ${panelBrand || "—"}`,
     `Panel quantity: ${panelQty || "—"}`,
     `Panel watt: ${panelWatt ? `${panelWatt} W` : "—"}`,
@@ -130,7 +128,7 @@ function buildCommercialQuotationData() {
 
   const rows = [
     {
-      description: "System Details (Information Only)",
+      description: "System Details",
       detail: systemDetails,
       qty: "—",
       rate: "—",
@@ -291,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Recalculate when pricing or optional charges change.
-  ["inverterKW", "ratePerKW", "meterCharge", "structureCost"].forEach((id) => {
+  ["inverterKW", "grandTotal", "meterCharge", "structureCost"].forEach((id) => {
     document.getElementById(id)?.addEventListener("input", calcCommercial);
   });
 
