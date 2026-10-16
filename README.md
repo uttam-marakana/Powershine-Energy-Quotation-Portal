@@ -1,32 +1,293 @@
-# PowerShine Energy Quotation Portal — v30.1
+# PowerShine Energy Quotation Portal
 
-A lightweight static quotation portal for PowerShine Energy dealers. It supports separate Residential and Commercial quotation forms, a shared quotation data model, a supplied 6-page PDF quotation template, in-browser PDF generation, final PDF preview, and PDF download. The quotation template URL is versioned so the latest 6-page template is loaded instead of an older browser/CDN cache.
+A lightweight, browser-based quotation portal for PowerShine Energy dealers. It provides separate **Residential** and **Commercial / Industrial** quotation forms, automatic calculations, and generation of a branded PDF quotation using the project's shared PDF template.
 
----
+## Purpose and benefits
 
-## Project Overview
+The portal gives dealers a consistent way to prepare solar quotations without manually assembling every quotation document.
 
-The PowerShine Energy Quotation Portal is a frontend-only quotation system designed for dealers to create professional solar quotations.
+It is useful for:
 
-The portal provides:
+- Preparing residential and commercial quotations through dedicated forms.
+- Calculating totals from the values entered into each form.
+- Capturing customer, installation, panel, inverter, and quotation-creator details.
+- Applying the project's configured charges and residential subsidy-reference rules.
+- Generating a branded PDF from the shared PowerShine Energy quotation template.
+- Previewing the generated PDF before downloading it.
+- Keeping the output layout and branding consistent across quotations.
+- Using the portal in desktop and mobile browsers.
 
-- Residential quotation form
-- Commercial / Industrial quotation form
-- Shared PDF quotation template
-- Dynamic quotation data mapping
-- Automatic quotation calculations
-- PDF preview
-- PDF download
-- PowerShine Energy branding
-- Responsive desktop/mobile interface
 
-The project does **not** require a backend, database, SMTP server, email service, or Daily Media Post feature.
+### Architecture overview
 
----
+index.html
+   ├── Residential link ──> residential.html ──> js/residential.js ──┐
+   └── Commercial link  ──> commercial.html  ──> js/commercial.js  ──┤
+                                                                     ↓
+                                                               js/common.js
+                                                   shared helpers + quotation model
+                                                                     ↓
+                                                     assets/quotation-template.pdf
+                                                                     ↓
+                                                    dynamic quotation PDF generation
+                                                                     ↓
+                                                       preview modal / PDF download
 
-## Official Brand Basis
 
-The portal branding is aligned with the PowerShine Energy brand information used in the project.
+## Project structure
+
+powershine-energy-quotation-portal/
+├── index.html
+├── residential.html
+├── commercial.html
+├── css/
+│   └── style.css
+├── js/
+│   ├── common.js
+│   ├── residential.js
+│   └── commercial.js
+├── assets/
+│   ├── powershine-energy-logo.png
+│   ├── quotation-template.pdf
+│   ├── quotation-footer.png
+│   └── favicon.png
+├── docs/
+│   ├── powershine-template.pdf
+│   ├── powershine-energy-final-quotation-template.pdf
+│   ├── powershine-energy-ai-logo.png
+│   ├── powershine-energy-quotation-portal-source-code.md
+│   └── PACKAGE-CONTENTS.md
+├── vercel.json
+└── README.md
+
+## Complete workflow
+
+### 1. Open the portal
+
+The dealer opens `index.html`. The home page displays the PowerShine Energy brand and links to the two workflows:
+
+- Residential Quotation
+- Commercial Quotation
+
+### 2. Choose the quotation type
+
+The dealer opens the form that matches the installation/customer type. Each form has its own HTML and JavaScript file, but both reuse the common PDF-generation system.
+
+### 3. Enter customer and quotation details
+
+The dealer enters the required customer details, chooses brands, and enters the technical and pricing values required by that form. Required fields are checked by browser form validation and the form's JavaScript.
+
+### 4. Review calculations
+
+The relevant form script recalculates the quotation summary when calculation-related values change. Optional charge rows are hidden when the corresponding charge is zero or blank.
+
+### 5. Generate the quotation data
+
+The form-specific script maps the entered fields into a common quotation data object. This includes customer details, date, quotation ID, creator information, item rows, totals, and notes.
+
+### 6. Build the PDF
+
+The shared code in `js/common.js` loads the six-page template at `assets/quotation-template.pdf`, overlays the dynamic quotation details, and creates a PDF in the browser. The form's field values are mapped to the quotation page; the rest of the template supplies the fixed branded pages.
+
+### 7. Preview the PDF
+
+The portal displays the generated PDF in its preview modal. The dealer should verify customer details, quotation values, optional charges, creator information, and the final total before sharing the document.
+
+### 8. Download the PDF
+
+The dealer downloads the generated PDF using the provided download action. The downloaded document contains the fixed template pages plus the generated quotation details.
+
+Open portal
+   ↓
+Choose Residential or Commercial
+   ↓
+Enter customer + technical + pricing details
+   ↓
+Validate required fields and conditional inputs
+   ↓
+Calculate form-specific totals
+   ↓
+Map form data into the shared quotation model
+   ↓
+Load template and generate PDF
+   ↓
+Preview and review the generated document
+   ↓
+Download PDF
+
+## Residential quotation workflow
+
+The Residential form is intended for residential solar quotations and contains customer, panel, inverter, pricing, subsidy-reference, and optional-charge information.
+
+### Residential form fields
+
+- Date
+- Customer name
+- Mobile number
+- City
+- Panel brand
+- Panel type
+- Panel quantity
+- Panel wattage
+- Inverter brand
+- Calculated system capacity in kW
+- Quotation total
+- Subsidy reference
+- DISCOM charge
+- Structure fees
+- Quotation creator name and mobile
+- Channel Partner Code
+
+### Panel brands and panel types
+
+The form includes the configured panel brands and panel types. The available panel-watt options depend on the selected brand and type. The current JavaScript builds and updates the wattage options rather than treating every wattage as valid for every brand.
+
+Configured combinations documented by the project are:
+
+| Panel brand | Panel type | Supported wattage       |
+| ----------- | ---------- | ----------------------- |
+| APS         | Bifacial   | 550 W                   |
+| APS         | TOPCon     | 600 W                   |
+| Waaree      | Bifacial   | 530–540 W in 5 W steps  |
+| Waaree      | TOPCon     | 580–610 W in 5 W steps  |
+| Adani       | Bifacial   | 550 W and 555 W         |
+| Adani       | TOPCon     | 610 W, 615 W, and 620 W |
+| Solarium    | TOPCon     | 720 W                   |
+
+If an unsupported brand/type combination is selected, the wattage list should not be treated as a free-form calculation input. Keep the brand/type/wattage rules aligned with `buildPanelWattOptions()` and `updatePanelWattOptions()` in `js/residential.js`.
+
+**Subsidy is a reference value.** The current business rule states that subsidy is shown for reference and is not directly subtracted from the quotation to calculate what the customer pays. The customer payable amount includes the quotation amount and applicable charges.
+
+Optional charges:
+
+- **DISCOM Charge:** Included when a positive value is entered; omitted from the PDF item list when blank or zero.
+- **Structure Fees:** Included when a positive value is entered; omitted from the PDF item list when blank or zero.
+
+The summary displays the customer payable amount and hides the corresponding optional-charge row when its value is zero.
+
+### Residential Other options
+
+Where a form field offers **Other**, the user can supply a custom value. The field should only be required while its associated Other option is selected. The subsidy Other option is a numeric amount, not a brand name.
+
+## Commercial quotation workflow
+
+The Commercial form is intended for commercial and industrial solar quotations. The commercial flow intentionally separates **panel information** from **inverter-based pricing**.
+
+### Commercial form fields
+
+**Customer details**
+
+- Date
+- Customer name
+- Business name
+- Contact number
+- City / installation location
+
+**Plant and panel details**
+
+- Plant Size
+- Panel Brand
+- Panel Quantity
+- Panel Watt
+
+Plant size, panel brand, panel quantity, and panel wattage are included as quotation information. **Panel wattage and panel quantity must not be used to calculate inverter kW or the base price.**
+
+**Inverter and pricing**
+
+- Inverter Brand
+- Inverter kW, entered directly by the customer
+- Rate per kW, entered separately by the customer
+- Registration Charges
+- Optional Meter Charge
+- Optional Structure Cost
+- Note / terms
+- Quotation creator name and mobile
+- Channel Partner Code
+
+Registration charges are selectable using the options configured in the form. The current form includes ₹0 and ₹12,650 options.
+
+Meter Charge and Structure Cost are independent optional values:
+
+- Blank or zero Meter Charge: omit the Meter Charge row from the summary and generated PDF.
+- Positive Meter Charge: include it in the total and PDF.
+- Blank or zero Structure Cost: omit the Structure Cost row from the summary and generated PDF.
+- Positive Structure Cost: include it in the total and PDF.
+- If both are positive, include both charges.
+
+The form's summary displays Inverter Capacity, Rate × kW, Registration, applicable optional charges, and Grand Total.
+
+### Commercial Other options
+
+Panel Brand and Inverter Brand each provide an **Other** radio option. Selecting Other opens a custom text field. The custom field is required while Other is selected and is used in the generated quotation data. Choosing a standard brand hides and clears the custom field.
+
+### Commercial panel information is not a pricing formula
+
+The quotation may display Plant Size, Panel Brand, Panel Quantity, and Panel Watt in the PDF for reference. Those values do not calculate or overwrite Inverter kW. Commercial base pricing is based only on the directly entered Inverter kW and Rate per kW.
+
+## Shared PDF generation
+
+Both forms use the shared PDF-generation code in `js/common.js` and the template at `assets/quotation-template.pdf`.
+
+### Template pages
+
+The approved template is documented as six pages:
+
+1. Cover page
+2. About PowerShine Energy
+3. Product Photos
+4. Dynamic Quotation page
+5. Notes, Bank Details, and Terms & Conditions
+6. Thank You page
+
+The fixed pages contain the brand artwork and business information. The dynamic quotation page is populated from the form data.
+
+### PDF data mapping
+
+The generated quotation can include:
+
+- Quotation ID and date
+- Expiry date
+- Customer and business details
+- Address / city and contact details
+- Quotation creator name and mobile
+- Channel Partner Code
+- System / plant capacity
+- Quotation item rows and descriptions
+- Quantities, rates, and totals
+- Applicable charges
+- Subsidy reference for Residential
+- Note and amount in words
+
+The shared PDF code owns the template loading, text placement, currency handling, preview modal, and download workflow. Avoid duplicating those responsibilities in the form scripts.
+
+### Currency handling
+
+The project uses `pdf-lib` for PDF operations. The shared code includes a workaround for rendering the Indian Rupee symbol when standard PDF font encoding cannot represent it directly. Preserve this logic when changing PDF generation; removing it may reintroduce a currency-encoding error.
+
+## Validation and business rules
+
+The following rules are important to preserve during future changes:
+
+1. Required customer and quotation fields must be validated before PDF generation.
+2. Numeric inputs must not accept negative amounts or capacities.
+3. Monetary and capacity values should be parsed as finite numbers before calculation.
+4. An **Other** text field is required only when its matching Other radio option is selected.
+5. Selecting a standard brand should hide and clear its custom Other field.
+6. Commercial Inverter kW is entered directly and is not calculated from panel wattage or quantity.
+7. Commercial base amount is Inverter kW multiplied by Rate per kW.
+8. Residential system kW is calculated from panel quantity and panel wattage.
+9. Residential subsidy is a reference value, not an automatic deduction from customer payable.
+10. Blank or zero optional charges are omitted from the generated PDF and do not add to the total.
+11. Positive optional charges are included in both the total and the PDF.
+12. Channel Partner Code uses the `CP-` prefix behavior implemented in `js/common.js`; retain prefix locking and validation when editing the forms.
+13. Both forms must continue using the shared PDF template and shared PDF-generation functions.
+14. Do not infer or create a backend, email-sending service, database, or other feature that is not present in the static project.
+
+## Branding and template assets
+
+The portal uses PowerShine Energy's orange-and-white visual identity, with black default text, orange primary actions, darker orange interaction states, the PowerShine Energy logo, and branded quotation pages.
+
+Brand details present in the project's existing documentation and home page include:
 
 - **Brand:** PowerShine Energy
 - **Tagline:** Let's try sun energy
@@ -34,859 +295,84 @@ The portal branding is aligned with the PowerShine Energy brand information used
 - **Email:** info@powershineenergy.com
 - **Website:** https://www.powershineenergy.com/
 
-National locations referenced by the project:
+The generated PDF template also contains company address, banking, terms, and contact information. If those business details change, update the approved template through the project’s normal asset-review workflow; changing the HTML alone does not update fixed text baked into the PDF artwork.
 
-- Rajkot
-- Ahmedabad
-- Nagpur
-- Mumbai
-- Pune
-- Rajasthan
 
----
+## Troubleshooting
 
-# Features
+### PDF preview is blank or the template cannot be loaded
 
-## Quotation Forms
+- Verify that `assets/quotation-template.pdf` exists in the deployed root and is accessible by URL.
+- Check the browser Network panel for 404, blocked requests, or cache issues.
+- Confirm the browser can load the pdf-lib CDN dependency.
+- Preserve the template URL/versioning behavior in `js/common.js` when changing the template.
 
-The portal contains two quotation forms:
+### `Cannot read properties of null` in the browser console
 
-### Residential
+A JavaScript function may be requesting an element ID that does not exist in the current HTML. When changing form markup, keep the IDs expected by the corresponding JavaScript in sync. Use null-safe checks for optional elements and confirm that the script is loaded after the form markup.
 
-Supports:
+### Totals are incorrect
 
-- Customer details
-- Date
-- Customer name
-- Mobile number
-- City
-- Panel brand
-- Panel type
-- Panel wattage
-- Panel quantity
-- Inverter brand
-- System calculation
-- Subsidy reference
-- DISCOM charge
-- Customer payable amount
-- Quotation creator
-- Channel Partner Code
+- Check the browser console for parsing or missing-element errors.
+- Verify the IDs for Inverter kW, Rate per kW, registration, and optional charges.
+- Remember that commercial panel values are informational only.
+- Check that optional charges are counted once and omitted when blank or zero.
+- Verify that the amount-in-words value is derived from the same final payable amount shown in the PDF.
 
-### Commercial / Industrial
+### An Other input does not appear or is incorrectly required
 
-Supports:
+Confirm that the radio `name`, the selected value `Other`, the custom input ID, and the toggle function call match between the HTML and JavaScript. The custom field should be required only while Other is selected.
 
-- Customer / company details
-- Business name
-- GST number
-- Contact number
-- Installation address
-- Plant size
-- Panel details
-- Panel brand
-- Panel quantity
-- Panel wattage
-- Inverter brand
-- Inverter capacity
-- Registration charges
-- Meter charges
-- Other government charges
-- Quotation creator
-- Channel Partner Code
+### The Rupee symbol fails during PDF generation
 
----
+Do not remove or bypass the currency-rendering workaround in `js/common.js` without testing the generated PDF. The standard PDF font encoding may not support the Rupee glyph directly.
 
-# Panel Brand Values
+## Scope and limitations
 
-The following Panel Brand values are used in the quotation forms:
+The current version provides:
 
-- Aps
-- Waaree
-- Adani
-- Solarium
+- Static form pages
+- Client-side validation and calculations
+- In-browser PDF generation
+- PDF preview and download
+- Shared branding and quotation template
 
-These values are available in both Residential and Commercial quotation forms.
+The current version does **not** provide:
 
----
+- Backend APIs or server-side calculations
+- Database storage of customers or quotations
+- Authentication, roles, or dealer-specific access control
+- Email sending or automated email delivery
+- Cloud-based quotation history or audit logs
+- Automatic verification of customer-entered business information
 
-# Inverter Brand Values
+If these capabilities are required later, they should be planned as separate features rather than assumed to exist in the current frontend-only portal.
 
-The following Inverter Brand values are used in the quotation forms:
+## Maintaining the project
 
-- Rem
-- Aps
-- Polycab
-- Solaryaan
+When making future changes:
 
-These values are available in both Residential and Commercial quotation forms.
+1. Start from the latest master ZIP explicitly identified by the project owner. As of 16 October 2026, that is `powershine-energy-quotation-portal.zip`.
+2. Inspect the current HTML, JavaScript, CSS, template, and assets before editing. Do not rely on older snippets as the current source of truth.
+3. Make targeted changes and preserve existing paths, IDs, script references, asset references, and working behavior unless a change requires otherwise.
+4. Keep Residential and Commercial calculations separate; only shared behavior should be added to `js/common.js`.
+5. Test both forms after changing shared PDF generation or validation logic.
+6. Check browser console errors, generated totals, optional PDF rows, preview, and download.
+7. Verify ZIP integrity and confirm the updated files are included before sharing a revised archive.
+8. Update this README when the implementation or business rules actually change.
 
----
+### Current business-rule summary
 
-# Panel Wattage Rules
+| Rule                                    | Residential                                                 | Commercial                                       |
+| --------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------ |
+| Panel quantity and wattage determine kW | Yes, system kW is calculated from quantity × wattage        | No, panel fields are informational only          |
+| Inverter kW                             | Displayed/handled as part of residential system information | Entered directly by the customer                 |
+| Rate per kW                             | Follows residential form's configured pricing logic         | Required; base amount = Inverter kW × rate       |
+| Subsidy                                 | Reference only; not directly deducted from customer payable | Not part of the commercial calculation           |
+| Optional government/site charges        | DISCOM Charge and Structure Fees                            | Meter Charge and Structure Cost                  |
+| Blank/zero optional charge              | Hidden/omitted and not added to payable                     | Hidden/omitted and not added to total            |
+| Other brand option                      | Custom field when offered by the form                       | Custom fields for Panel Brand and Inverter Brand |
+| PDF generation                          | Shared template and PDF code                                | Shared template and PDF code                     |
 
-Panel Brand and Panel Type remain radio-button fields.
 
-Only **Panel Watt** is a dependent dropdown.
-
-Configured combinations:
-
-| Brand | Panel Type | Wattage Range | Dropdown Values |
-|---|---|---:|---|
-| APS | Bifacial | 550–550 W | 550 W |
-| APS | TOPCon | 600–600 W | 600 W |
-| Waaree | Bifacial | 530–540 W | 530, 535, 540 W |
-| Waaree | TOPCon | 580–610 W | 580, 585, 590, 595, 600, 605, 610 W |
-| ADANI | Bifacial | 550–555 W | 550, 555 W |
-| ADANI | TOPCon | 610–620 W | 610, 615, 620 W |
-| Solarium | TOPCon | 720–720 W | 720 W |
-
-The ranges use a **5 W step** where multiple wattages are supported.
-
-Only supported Brand + Panel Type combinations populate the Panel Watt dropdown.
-
-The selected wattage continues to drive the residential system-kW calculation.
-
----
-
-# PDF Quotation System
-
-Both Residential and Commercial forms use the same shared PDF generation system.
-
-The architecture is:
-
-```text
-Residential Form ──┐
-                   │
-                   ├──> Form Data Mapper
-                   │
-Commercial Form ───┘
-                         ↓
-                Common Quotation Model
-                         ↓
-                 Shared PDF Template
-                         ↓
-                 Dynamic PDF Overlay
-                         ↓
-                    PDF Preview
-                         ↓
-                    PDF Download
-```
-
----
-
-# PDF Template
-
-The project uses a **6-page quotation PDF template**.
-
-The final template contains:
-
-1. Cover
-2. About PowerShine Energy
-3. Product Photos
-4. Quotation
-5. Notes + Bank Details + Terms & Conditions
-6. Thank You
-
-The Material Details and Testimonials pages are not included in the final six-page quotation template.
-
----
-
-# Page 6 — Thank You Page
-
-For V29, the final Thank You page was replaced using the **last Thank You page from the supplied reference quotation PDF**.
-
-The source reference contains a dedicated Thank You page with:
-
-- PowerShine Energy branding
-- Thank You artwork
-- Solar installation imagery
-- Communication information
-- Mobile number
-- Email
-- Website
-- Corporate office information
-- PowerShine Energy footer branding
-
-The supplied reference Thank You page is used only as the final PDF template page.
-
-No quotation form logic is stored inside the page artwork.
-
----
-
-# PDF Template Behavior
-
-The supplied quotation template contains the fixed visual layout.
-
-Dealer/customer information is generated dynamically by the portal.
-
-During PDF generation:
-
-1. The portal loads the supplied PDF template.
-2. The quotation page content area is prepared for dynamic data.
-3. Customer information is mapped from the selected quotation form.
-4. Quotation items are generated dynamically.
-5. Quantity, rate and total values are calculated.
-6. Residential subsidy and DISCOM information are included where applicable.
-7. Quotation creator information is mapped.
-8. Channel Partner Code is mapped.
-9. The generated PDF is displayed in the preview modal.
-10. The final PDF can be downloaded.
-
----
-
-# Quotation Page
-
-The quotation page follows the project quotation structure:
-
-```text
-# | Item & Description | Qty | Rate | Discount | Total
-```
-
-The quotation data can include:
-
-- Solar power generating system
-- Panel brand
-- Panel quantity
-- Panel wattage
-- System capacity
-- Inverter brand
-- Inverter capacity
-- Registration charges
-- Meter charges
-- Other applicable charges
-- Subsidy reference
-- DISCOM charges
-
-GST-related quotation columns/data are not used in the final quotation layout where excluded by the project configuration.
-
----
-
-# Residential Calculation
-
-Residential quotation calculations include:
-
-- System size
-- Panel quantity
-- Panel wattage
-- Inverter information
-- Base quotation amount
-- Subsidy reference
-- DISCOM charge
-- Customer payable amount
-
-The subsidy is displayed as a **reference amount**.
-
-The project does not deduct the subsidy directly from the quotation amount when calculating the customer payable value.
-
----
-
-# Commercial Calculation
-
-Commercial quotations support:
-
-- Plant size
-- Inverter capacity
-- Rate per kW
-- Base system amount
-- Registration charges
-- Meter charges
-- Other government charges
-- Final quotation total
-
-The commercial calculation follows the project formula:
-
-```text
-Base Amount = Inverter kW × Rate
-```
-
-Additional charges are then added to calculate the final quotation amount.
-
----
-
-# Quotation Creator
-
-The portal supports quotation creator information.
-
-The creator fields include:
-
-- Quotation Creator Name
-- Quotation Creator Mobile
-- Channel Partner Code
-
-The creator fields are required where configured by the quotation form.
-
----
-
-# Channel Partner Code
-
-The quotation contains a manually entered:
-
-```text
-Channel Partner Code
-```
-
-The default field value starts with:
-
-```text
-CP-
-```
-
-Example:
-
-```text
-CP-001
-```
-
-The dealer/customer can complete the Channel Partner Code manually.
-
-The code is included in the generated quotation PDF.
-
----
-
-# PDF Currency Handling
-
-The portal uses `pdf-lib`.
-
-Standard PDF Helvetica uses WinAnsi encoding and cannot directly encode the Indian Rupee symbol:
-
-```text
-₹
-```
-
-To avoid the previous:
-
-```text
-WinAnsi cannot encode "₹"
-```
-
-error, the portal renders the Rupee symbol through browser Unicode support as a small transparent image and embeds that image into the generated PDF.
-
-This allows the quotation PDF to display Indian Rupee values correctly while continuing to use the stable PDF standard fonts.
-
----
-
-# PDF Preview
-
-The quotation workflow supports:
-
-```text
-Generate PDF & Preview
-```
-
-The generated PDF is displayed inside the preview modal.
-
-The user can:
-
-- Preview the complete PDF
-- Close the preview
-- Download the generated PDF
-
-The preview uses the actual generated quotation PDF rather than a separate static preview.
-
----
-
-# UI Theme
-
-The portal uses the PowerShine Energy orange-and-white theme.
-
-### Primary styling
-
-- Orange primary actions
-- Dark orange hover states
-- Dark orange active states
-- Dark orange borders
-- Black default text
-- White cards
-- White content areas
-- Responsive logo
-- Responsive form layout
-
-The interface is designed for both desktop and mobile usage.
-
----
-
-# Responsive Design
-
-The portal supports:
-
-- Desktop screens
-- Laptop screens
-- Tablets
-- Mobile devices
-
-The quotation forms and action buttons adapt to smaller screen widths.
-
-V29 also includes the mobile validation fix required for the quotation forms.
-
----
-
-# Project Structure
-
-```text
-powershine-energy-quotation-portal/
-│
-├── index.html
-├── residential.html
-├── commercial.html
-│
-├── css/
-│   └── style.css
-│
-├── js/
-│   ├── common.js
-│   ├── residential.js
-│   └── commercial.js
-│
-├── assets/
-│   ├── favicon.png
-│   ├── powershine-energy-logo.png
-│   ├── powershine-energy-logo.png
-│   ├── powershine-energy-logo.svg
-│   ├── quotation-footer.png
-│   └── quotation-template.pdf
-│
-├── docs/
-│   ├── PACKAGE-CONTENTS.md
-│   ├── powershine-energy-logo.png
-│   └── powershine-energy-final-quotation-template.pdf
-│
-├── README.md
-│
-└── vercel.json
-```
-
----
-
-# Main Files
-
-## `index.html`
-
-Portal home page.
-
-Provides access to the available quotation forms and PowerShine Energy branding.
-
----
-
-## `residential.html`
-
-Residential quotation form.
-
-Contains:
-
-- Customer details
-- Panel configuration
-- Inverter configuration
-- Subsidy
-- DISCOM charge
-- Quotation creator
-- Channel Partner Code
-- PDF generation controls
-
----
-
-## `commercial.html`
-
-Commercial / Industrial quotation form.
-
-Contains:
-
-- Customer/company information
-- Plant information
-- Panel configuration
-- Inverter configuration
-- Registration charges
-- Meter charges
-- Other government charges
-- Quotation creator
-- Channel Partner Code
-- PDF generation controls
-
----
-
-## `css/style.css`
-
-Contains:
-
-- Portal layout
-- Form styling
-- Buttons
-- Cards
-- Header
-- Footer
-- Responsive styles
-- Mobile styles
-- PDF preview modal styling
-
----
-
-## `js/common.js`
-
-Shared quotation functionality.
-
-Responsible for common functionality such as:
-
-- PDF loading
-- PDF generation
-- PDF preview
-- PDF download
-- INR formatting
-- Rupee glyph handling
-- Amount-in-words generation
-- Shared quotation model
-- Template processing
-- Common PDF rendering utilities
-
----
-
-## `js/residential.js`
-
-Responsible for:
-
-- Residential form calculations
-- Panel wattage handling
-- Residential quotation mapping
-- Subsidy calculation/reference
-- DISCOM charge handling
-- Residential PDF data generation
-
----
-
-## `js/commercial.js`
-
-Responsible for:
-
-- Commercial form calculations
-- Plant size calculation
-- Inverter calculation
-- Registration charges
-- Meter charges
-- Other charges
-- Commercial quotation mapping
-- Commercial PDF data generation
-
----
-
-# Assets
-
-## PowerShine Energy Logo
-
-The project includes:
-
-```text
-assets/powershine-energy-logo.png
-assets/powershine-energy-logo.png
-assets/powershine-energy-logo.svg
-```
-
-The SVG version acts as a lightweight logo fallback.
-
----
-
-## Quotation Template
-
-The primary quotation template is:
-
-```text
-assets/quotation-template.pdf
-```
-
-The reference/final template copy is also maintained under:
-
-```text
-docs/powershine-energy-final-quotation-template.pdf
-```
-
-Both represent the final six-page quotation template used by the project.
-
----
-
-# External Libraries
-
-The quotation pages use:
-
-```text
-pdf-lib@1.17.1
-```
-
-loaded from the public CDN.
-
-No package installation is required for the static frontend.
-
----
-
-# Backend
-
-The project is intentionally frontend-only.
-
-There is:
-
-- No backend
-- No Node.js server
-- No Express
-- No database
-- No SMTP
-- No Nodemailer
-- No email API
-- No authentication system
-- No server-side PDF generation
-
-The PDF is generated directly in the browser.
-
----
-
-# Email
-
-Email functionality has been removed from the project.
-
-The portal does not:
-
-- Send quotations by email
-- Store email configuration
-- Use SMTP
-- Use Nodemailer
-- Use `mailto`
-- Require a backend email service
-
-The user downloads the generated quotation PDF directly.
-
----
-
-# Daily Media Post
-
-The Daily Media Post feature has been removed.
-
-The project does not include:
-
-```text
-social.html
-js/social.js
-```
-
-or related Daily Media Post functionality.
-
----
-
-# Local Development
-
-The project is a static website.
-
-You can run it using any static server.
-
-For example, with VS Code Live Server:
-
-1. Open the project folder.
-2. Start Live Server.
-3. Open:
-
-```text
-index.html
-```
-
-4. Select the required quotation form.
-5. Complete the quotation form.
-6. Click:
-
-```text
-Generate PDF & Preview
-```
-
-7. Review the generated PDF.
-8. Download the quotation.
-
----
-
-# Local Server Using `serve`
-
-The project can also be run using:
-
-```bash
-npx serve . -l 3000
-```
-
-The portal will then be available locally on port:
-
-```text
-3000
-```
-
----
-
-# Ngrok
-
-For temporary external access during testing:
-
-```bash
-ngrok http 3000
-```
-
-For a configured ngrok custom domain:
-
-```bash
-ngrok http --url=quotation.powershineenergy.com 3000
-```
-
----
-
-# Vercel Deployment
-
-The project is suitable for static Vercel deployment.
-
-No build command is required.
-
-The project can be deployed directly from GitHub/Vercel.
-
-The quotation portal does not require a backend runtime.
-
----
-
-# Vercel Configuration
-
-The project includes:
-
-```text
-vercel.json
-```
-
-for the required static deployment configuration.
-
----
-
-# V30 Change History
-
-## V30
-
-V30 is the latest project update based directly on the V29 project baseline.
-
-The V30 update includes:
-
-1. Re-enabled the **Commercial** item in the main navigation menu.
-2. Re-enabled the **Commercial Quotation** card on the home page.
-3. Restored the direct Commercial form URL:
-   `commercial.html`
-4. Confirmed the Commercial quotation continues to use the same shared PDF generation system and the same six-page quotation template used by the Residential quotation.
-5. Replaced the final template page using **Page 9 (the final Thank You page) from the latest supplied reference file `EST-006907.pdf`**.
-6. Updated both template copies to use the same final six-page PDF:
-   - `assets/quotation-template.pdf`
-   - `docs/powershine-energy-final-quotation-template.pdf`
-7. No Commercial calculation logic, PDF mapping logic, Residential behavior, CSS, or other quotation functionality was changed as part of the Commercial menu re-enable/template update.
-
-### Current PDF Template
-
-The shared quotation template is now:
-
-```text
-Page 1 — Cover
-Page 2 — About PowerShine Energy
-Page 3 — Product Photos
-Page 4 — Quotation
-Page 5 — Notes + Bank Details + Terms & Conditions
-Page 6 — Thank You (from Page 9 of EST-006907.pdf)
-```
-
-Both Residential and Commercial forms use this same template.
-
----
-
-# V29 Change History
-
-## V29
-
-V29 is based on the previous V28 version.
-
-The V29 functional changes include:
-
-1. Fixed mobile HTML validation behavior for the quotation creator mobile fields.
-2. Restored the shared `amountInWordsINR()` utility required by PDF generation.
-3. Preserved the approved V28 PDF layout.
-4. Preserved PowerShine Energy branding and logo assets.
-5. Preserved existing Residential quotation behavior.
-6. Preserved existing Commercial quotation behavior.
-7. Preserved the existing Panel Brand values.
-8. Preserved the existing Inverter Brand values.
-9. Preserved the existing Panel Wattage dependency logic.
-10. Preserved PDF preview and download behavior.
-
----
-
-# V29 PDF Template Update
-
-After the V29 code baseline was finalized, the PDF template was updated separately.
-
-The final PDF template change was intentionally limited to the PDF template.
-
-The last Thank You page from the supplied reference quotation PDF was used as the replacement for the final Thank You page of the portal template.
-
-The PDF template therefore remains:
-
-```text
-Page 1 — Cover
-Page 2 — About PowerShine Energy
-Page 3 — Product Photos
-Page 4 — Quotation
-Page 5 — Notes + Bank Details + Terms & Conditions
-Page 6 — Thank You
-```
-
-The replacement was made only at the PDF-template level. No HTML, CSS, JavaScript, calculation logic, or quotation form behavior was changed as part of this PDF-only update.
-
----
-
-# Final V29 Baseline
-
-The final V29 project baseline consists of:
-
-- Residential quotation form
-- Commercial quotation form
-- Shared quotation PDF generation
-- Six-page quotation template
-- Updated final Thank You page
-- PDF preview
-- PDF download
-- Panel Brand configuration
-- Inverter Brand configuration
-- Panel Wattage dependency
-- Subsidy reference
-- DISCOM charge handling
-- Channel Partner Code
-- Quotation Creator
-- PowerShine Energy branding
-- Responsive interface
-- Mobile validation fix
-- `amountInWordsINR()` PDF generation fix
-- No backend
-- No email service
-- No Daily Media Post feature
-
----
-
-# Final Package
-
-The final project package contains the complete V29 project structure and the latest V29 PDF template.
-
-Primary PDF template:
-
-```text
-assets/quotation-template.pdf
-```
-
-Reference/final PDF template:
-
-```text
-docs/powershine-energy-final-quotation-template.pdf
-```
-
-Project documentation:
-
-```text
-README.md
-```
-
----
-
-# Version
-
-```text
-PowerShine Energy Quotation Portal
-Version: V29
-Status: Final
-```
+**Maintained for the PowerShine Energy Quotation Portal.**
