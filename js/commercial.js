@@ -1,14 +1,11 @@
 function readNumber(id) {
   const element = document.getElementById(id);
-
   if (!element) return 0;
 
   const rawValue = String(element.value ?? "").trim();
-
   if (!rawValue) return 0;
 
   const value = Number(rawValue);
-
   return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
@@ -18,45 +15,32 @@ function readText(id) {
 
 function setText(id, value) {
   const element = document.getElementById(id);
-
-  if (element) {
-    element.textContent = value;
-  }
+  if (element) element.textContent = value;
 }
 
 function toggleCommercialOther(inputId, radioName) {
   const input = document.getElementById(inputId);
-
   if (!input) return;
 
-  const selectedBrand = getRadioValue(radioName);
-  const showInput = selectedBrand === "Other";
-
+  const showInput = getRadioValue(radioName) === "Other";
   input.style.display = showInput ? "block" : "none";
   input.required = showInput;
 
-  if (!showInput) {
-    input.value = "";
-  }
+  if (!showInput) input.value = "";
 }
 
 function calcCommercial() {
-
   const invKW = readNumber("inverterKW");
-  const rate = readNumber("grandTotal");
-
-  const base = invKW * rate;
-
+  const grandTotal = readNumber("grandTotal");
   const reg = Math.max(0, Number(getRadioValue("regCharges")) || 0);
-
   const meter = readNumber("meterCharge");
   const structure = readNumber("structureCost");
 
-  const total = base + reg + meter + structure;
+  // Customer enters Grand Total directly. No kW × rate calculation.
+  const total = grandTotal + reg + meter + structure;
 
   setText("sumKW", invKW > 0 ? `${invKW.toFixed(2)} kW` : "—");
-
-  setText("sumBase", formatINR(base));
+  setText("sumBase", formatINR(grandTotal));
   setText("sumReg", formatINR(reg));
   setText("sumMeter", formatINR(meter));
   setText("sumStructure", formatINR(structure));
@@ -65,23 +49,10 @@ function calcCommercial() {
   const meterRow = document.getElementById("meterSummaryRow");
   const structureRow = document.getElementById("structureSummaryRow");
 
-  if (meterRow) {
-    meterRow.hidden = meter <= 0;
-  }
+  if (meterRow) meterRow.hidden = meter <= 0;
+  if (structureRow) structureRow.hidden = structure <= 0;
 
-  if (structureRow) {
-    structureRow.hidden = structure <= 0;
-  }
-
-  return {
-    invKW,
-    rate,
-    base,
-    reg,
-    meter,
-    structure,
-    total,
-  };
+  return { invKW, grandTotal, reg, meter, structure, total };
 }
 
 function buildCommercialQuotationData() {
@@ -94,7 +65,6 @@ function buildCommercialQuotationData() {
   const plantSize = readText("plantSize");
 
   const panelBrandValue = getRadioValue("panelBrand");
-
   const panelBrand =
     panelBrandValue === "Other" ? readText("panelBrandOther") : panelBrandValue;
 
@@ -102,7 +72,6 @@ function buildCommercialQuotationData() {
   const panelWatt = readText("panelWatt");
 
   const inverterBrandValue = getRadioValue("inverterBrand");
-
   const inverterBrand =
     inverterBrandValue === "Other"
       ? readText("inverterBrandOther")
@@ -110,13 +79,10 @@ function buildCommercialQuotationData() {
 
   const note = readText("note");
   const date = readText("date");
-
   const quotationId = createQuotationId("PSE-COM");
 
-  // These details are included for information only.
-  // They do not calculate or change inverter capacity.
   const systemDetails = [
-    `Plant size: ${plantSize || "—"} kW`,
+    `Plant size: ${plantSize || "—"}`,
     `Panel brand: ${panelBrand || "—"}`,
     `Panel quantity: ${panelQty || "—"}`,
     `Panel watt: ${panelWatt ? `${panelWatt} W` : "—"}`,
@@ -126,28 +92,22 @@ function buildCommercialQuotationData() {
     }`,
   ].join("\n");
 
+  // The entered Grand Total appears directly in the System Details row.
   const rows = [
     {
       description: "System Details",
       detail: systemDetails,
-      qty: "—",
-      rate: "—",
-      total: "—",
-    },
-    {
-      description: "Grand Total",
-      detail:
-        `Inverter capacity ${calc.invKW.toFixed(2)} kW × ` +
-        `rate ${formatINR(calc.rate)} per kW.`,
-      qty: `${calc.invKW.toFixed(2)} kW`,
-      rate: formatINR(calc.rate),
-      total: formatINR(calc.base),
+      qty: calc.invKW > 0 ? `${calc.invKW.toFixed(2)} kW` : "—",
+      rate: formatINR(calc.grandTotal),
+      discount: "0 %",
+      total: formatINR(calc.grandTotal),
     },
     {
       description: "Registration Charges",
       detail: "Registration charges selected in the commercial quotation.",
       qty: "1",
       rate: formatINR(calc.reg),
+      discount: "0 %",
       total: formatINR(calc.reg),
     },
   ];
@@ -159,6 +119,7 @@ function buildCommercialQuotationData() {
       detail: "Meter charge entered for this client.",
       qty: "1",
       rate: formatINR(calc.meter),
+      discount: "0 %",
       total: formatINR(calc.meter),
     });
   }
@@ -169,6 +130,7 @@ function buildCommercialQuotationData() {
       detail: "Structure cost entered for this client.",
       qty: "1",
       rate: formatINR(calc.structure),
+      discount: "0 %",
       total: formatINR(calc.structure),
     });
   }
@@ -207,7 +169,7 @@ function buildCommercialQuotationData() {
     rows,
 
     subTotal: formatINR(calc.total),
-    subsidy: formatINR(0),
+    subsidy: "",
     tax: formatINR(0),
     grandTotal: formatINR(calc.total),
     amountInWords: amountInWordsINR(calc.total),
@@ -264,7 +226,6 @@ async function generatePDF() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("commercialForm");
-
   if (!form) return;
 
   if (typeof syncQuotationCreator === "function") {
@@ -273,7 +234,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   toggleCommercialOther("panelBrandOther", "panelBrand");
   toggleCommercialOther("inverterBrandOther", "inverterBrand");
-
   calcCommercial();
 
   document.querySelectorAll('input[name="panelBrand"]').forEach((radio) => {
@@ -288,8 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Recalculate when pricing or optional charges change.
-  ["inverterKW", "grandTotal", "meterCharge", "structureCost"].forEach((id) => {
+  ["grandTotal", "inverterKW", "meterCharge", "structureCost"].forEach((id) => {
     document.getElementById(id)?.addEventListener("input", calcCommercial);
   });
 
@@ -306,7 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ?.addEventListener("click", generatePDF);
 
   form.addEventListener("reset", () => {
-    // Reset runs before browser controls have completed their reset.
     setTimeout(() => {
       toggleCommercialOther("panelBrandOther", "panelBrand");
       toggleCommercialOther("inverterBrandOther", "inverterBrand");
