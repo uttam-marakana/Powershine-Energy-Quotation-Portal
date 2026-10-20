@@ -169,7 +169,7 @@ function buildCommercialQuotationData() {
     rows,
 
     subTotal: formatINR(calc.total),
-    subsidy: "",
+    // subsidy: "",
     tax: formatINR(0),
     grandTotal: formatINR(calc.total),
     amountInWords: amountInWordsINR(calc.total),
