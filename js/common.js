@@ -812,7 +812,7 @@ function drawQuotationPage(pdfDoc, data) {
   const summaryX = 405;
   const summaryRows = [
     ["Sub Total:", data.subTotal || "₹ 0"],
-    ["Subsidy (Reference):", data.subsidy || "₹ 0"],
+    ...(data.subsidy ? [["Subsidy (Reference):", data.subsidy]] : []),
     ["Total:", data.grandTotal || "₹ 0"],
   ];
 
