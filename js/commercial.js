@@ -236,6 +236,13 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleCommercialOther("inverterBrandOther", "inverterBrand");
   calcCommercial();
 
+  document
+    .getElementById("creatorDisplayMobile")
+    ?.addEventListener("input", (event) => {
+      const input = event.currentTarget;
+      input.value = input.value.replace(/\D/g, "").slice(0, 10);
+    });
+
   document.querySelectorAll('input[name="panelBrand"]').forEach((radio) => {
     radio.addEventListener("change", () => {
       toggleCommercialOther("panelBrandOther", "panelBrand");

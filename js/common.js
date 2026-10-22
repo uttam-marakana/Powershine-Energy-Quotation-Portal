@@ -2,7 +2,6 @@ const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=32-20261013";
 
 // Channel Partner Code: the "CP-" prefix is fixed; dealers only type what follows it.
 const CP_PREFIX = "CP-";
-const CP_REQUIRED = false; // set to true to force dealers to enter a code after "CP-"
 
 function toggleOther(inputId) {
   const input = document.getElementById(inputId);
@@ -133,7 +132,7 @@ function validateChannelPartnerCode() {
   const input = document.getElementById("channelPartnerCode");
   if (!input) return true;
   const cp = input.value.trim();
-  if (!cp.startsWith(CP_PREFIX) || (CP_REQUIRED && cp === CP_PREFIX)) {
+  if (!cp.startsWith(CP_PREFIX) || (input.required && cp === CP_PREFIX)) {
     alert(`Please enter the Channel Partner Code after ${CP_PREFIX}`);
     input.focus();
     return false;
