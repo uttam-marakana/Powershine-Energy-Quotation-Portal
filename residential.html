@@ -64,6 +64,9 @@
                 class="form-control"
                 id="mobile"
                 placeholder="10-digit mobile number"
+                inputmode="numeric"
+                pattern="[0-9]{10}"
+                maxlength="10"
                 required
               />
             </div>
@@ -446,7 +449,8 @@
                   id="creatorDisplayMobile"
                   placeholder="Enter quotation creator mobile"
                   inputmode="numeric"
-                  pattern="[0-9+()\- ]{10,15}"
+                  pattern="[0-9]{10}"
+                  maxlength="10"
                   required
                 />
               </div>
@@ -459,8 +463,18 @@
                   id="channelPartnerCode"
                   value="CP-"
                   placeholder="CP-001"
+                  inputmode="numeric"
                   autocomplete="off"
+                  maxlength="8"
+                  aria-describedby="channelPartnerCodeError"
                 />
+                <small
+                  class="field-error"
+                  id="channelPartnerCodeError"
+                  role="status"
+                  aria-live="polite"
+                  hidden
+                ></small>
               </div>
             </div>
 

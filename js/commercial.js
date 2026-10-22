@@ -185,6 +185,13 @@ async function generatePDF() {
     return;
   }
 
+  if (
+    typeof validateChannelPartnerCode === "function" &&
+    !validateChannelPartnerCode()
+  ) {
+    return;
+  }
+
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
@@ -200,13 +207,6 @@ async function generatePDF() {
     !readText("inverterBrandOther")
   ) {
     document.getElementById("inverterBrandOther")?.reportValidity();
-    return;
-  }
-
-  if (
-    typeof validateChannelPartnerCode === "function" &&
-    !validateChannelPartnerCode()
-  ) {
     return;
   }
 
@@ -236,12 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleCommercialOther("inverterBrandOther", "inverterBrand");
   calcCommercial();
 
-  document
-    .getElementById("creatorDisplayMobile")
-    ?.addEventListener("input", (event) => {
-      const input = event.currentTarget;
-      input.value = input.value.replace(/\D/g, "").slice(0, 10);
-    });
+  restrictInputToDigits("contactNo", 10);
+  restrictInputToDigits("creatorDisplayMobile", 10);
 
   document.querySelectorAll('input[name="panelBrand"]').forEach((radio) => {
     radio.addEventListener("change", () => {

@@ -2,6 +2,7 @@ const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=32-20261013";
 
 // Channel Partner Code: the "CP-" prefix is fixed; dealers only type what follows it.
 const CP_PREFIX = "CP-";
+const CP_CODE_MAX_LENGTH = 5;
 
 function toggleOther(inputId) {
   const input = document.getElementById(inputId);
@@ -76,6 +77,15 @@ function sanitizeFileName(value) {
   );
 }
 
+function restrictInputToDigits(inputId, maxLength) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, maxLength);
+  });
+}
+
 // Locks the "CP-" prefix in the Channel Partner Code input (residential + commercial).
 function lockChannelPartnerPrefix() {
   const input = document.getElementById("channelPartnerCode");
@@ -83,12 +93,22 @@ function lockChannelPartnerPrefix() {
   const len = CP_PREFIX.length;
 
   function enforcePrefix() {
-    let v = input.value;
-    // Collapse duplicated prefix (e.g. after pasting "CP-001")
-    while (v.toUpperCase().startsWith(CP_PREFIX + CP_PREFIX)) v = v.slice(len);
-    // Prefix was damaged: rebuild it and keep only what was typed after it
-    if (!v.startsWith(CP_PREFIX)) v = CP_PREFIX + v.replace(/^C?P?-?/i, "");
+    const currentValue = input.value;
+    const suffix = currentValue.toUpperCase().startsWith(CP_PREFIX)
+      ? currentValue.slice(len)
+      : currentValue.replace(/^C?P?-?/i, "");
+    const v =
+      CP_PREFIX + suffix.replace(/\D/g, "").slice(0, CP_CODE_MAX_LENGTH);
     if (v !== input.value) input.value = v;
+  }
+
+  function clearCodeError() {
+    const error = document.getElementById("channelPartnerCodeError");
+    if (error) {
+      error.textContent = "";
+      error.hidden = true;
+    }
+    input.removeAttribute("aria-invalid");
   }
 
   function caretAfterPrefix() {
@@ -114,7 +134,10 @@ function lockChannelPartnerPrefix() {
     }
   });
 
-  input.addEventListener("input", enforcePrefix);
+  input.addEventListener("input", () => {
+    enforcePrefix();
+    validateChannelPartnerCode();
+  });
   input.addEventListener("paste", () => setTimeout(enforcePrefix, 0));
   input.addEventListener("focus", () => setTimeout(caretAfterPrefix, 0));
   input.addEventListener("click", caretAfterPrefix);
@@ -123,20 +146,44 @@ function lockChannelPartnerPrefix() {
     if (input.selectionStart < len) e.preventDefault();
   });
 
-  // "Clear Form" calls form.reset(), which restores value="CP-" from the HTML.
+  input.closest("form")?.addEventListener("reset", () => {
+    setTimeout(() => {
+      enforcePrefix();
+      clearCodeError();
+    }, 0);
+  });
+
   enforcePrefix();
 }
 
-// Returns true when the Channel Partner Code is acceptable; otherwise alerts and returns false.
+// Returns true when the Channel Partner Code is acceptable; otherwise shows an inline error.
 function validateChannelPartnerCode() {
   const input = document.getElementById("channelPartnerCode");
   if (!input) return true;
   const cp = input.value.trim();
-  if (!cp.startsWith(CP_PREFIX) || (input.required && cp === CP_PREFIX)) {
-    alert(`Please enter the Channel Partner Code after ${CP_PREFIX}`);
+  let message = "";
+
+  if (!cp.startsWith(CP_PREFIX)) {
+    message = `Channel Partner Code must start with ${CP_PREFIX}.`;
+  } else if (!/^CP-\d{0,5}$/.test(cp)) {
+    message = "Enter digits only after CP-.";
+  } else if (input.required && cp === CP_PREFIX) {
+    message = "Please enter the numeric code after CP-.";
+  }
+
+  const error = document.getElementById("channelPartnerCodeError");
+  if (error) {
+    error.textContent = message;
+    error.hidden = !message;
+  }
+
+  if (message) {
+    input.setAttribute("aria-invalid", "true");
     input.focus();
     return false;
   }
+
+  input.removeAttribute("aria-invalid");
   return true;
 }
 

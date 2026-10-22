@@ -597,6 +597,17 @@ body {
   grid-column: 1 / -1;
 }
 
+.field-error {
+  display: block;
+  margin-top: 4px;
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+
+.field-error[hidden] {
+  display: none;
+}
+
 .creator-auto-field {
   background: #fffaf6;
   border-color: #efc6a8;
@@ -937,4 +948,3 @@ textarea {
     font-size: 0.88rem;
   }
 }
-

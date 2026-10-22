@@ -84,6 +84,9 @@
                 class="form-control"
                 id="contactNo"
                 placeholder="Mobile / Landline"
+                inputmode="numeric"
+                pattern="[0-9]{10}"
+                maxlength="10"
                 required
               />
             </div>
@@ -488,11 +491,20 @@
                   id="channelPartnerCode"
                   value="CP-"
                   placeholder="CP-001"
+                  inputmode="numeric"
                   autocomplete="off"
                   spellcheck="false"
-                  maxlength="20"
+                  maxlength="8"
                   required
+                  aria-describedby="channelPartnerCodeError"
                 />
+                <small
+                  class="field-error"
+                  id="channelPartnerCodeError"
+                  role="status"
+                  aria-live="polite"
+                  hidden
+                ></small>
               </div>
             </div>
 

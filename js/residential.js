@@ -231,12 +231,12 @@ function buildResidentialQuotationData() {
 async function generatePDF() {
   const form = document.getElementById("residentialForm");
 
+  if (!validateChannelPartnerCode()) return;
+
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
   }
-
-  if (!validateChannelPartnerCode()) return;
 
   const data = buildResidentialQuotationData();
   const fileName = `Residential_Quote_${sanitizeFileName(data.customerName)}_${data.date}.pdf`;
@@ -245,6 +245,9 @@ async function generatePDF() {
 
 document.addEventListener("DOMContentLoaded", () => {
   syncQuotationCreator();
+
+  restrictInputToDigits("mobile", 10);
+  restrictInputToDigits("creatorDisplayMobile", 10);
 
   calcResidential();
 
