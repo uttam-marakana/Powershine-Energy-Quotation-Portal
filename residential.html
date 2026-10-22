@@ -456,7 +456,9 @@
               </div>
 
               <div class="form-group creator-code-group">
-                <label for="channelPartnerCode">Channel Partner Code</label>
+                <label for="channelPartnerCode">
+                  Channel Partner Code <span class="req">*</span>
+                </label>
                 <input
                   type="text"
                   class="form-control"
@@ -466,6 +468,7 @@
                   inputmode="numeric"
                   autocomplete="off"
                   maxlength="8"
+                  required
                   aria-describedby="channelPartnerCodeError"
                 />
                 <small
