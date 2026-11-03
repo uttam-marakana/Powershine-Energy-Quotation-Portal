@@ -1045,7 +1045,34 @@ function openPdfPreviewModal(fileName) {
   document.addEventListener("keydown", modal._handleEscape);
 }
 
-function previewPDF(bytes, fileName) {
+// iOS Safari has inconsistent support for displaying multi-page PDFs inside
+// an iframe. Open the generated PDF in Safari's native PDF viewer instead.
+// The MacIntel + touch-points check also covers iPadOS using desktop-style UA.
+function isIOSDevice() {
+  return (
+    /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
+function openIOSPdfTab() {
+  // This must run synchronously from the user's Generate PDF click, before
+  // the first await, otherwise Safari may block the new tab as a popup.
+  const previewWindow = window.open("about:blank", "_blank");
+  if (!previewWindow) return null;
+
+  try {
+    previewWindow.document.title = "Preparing quotation PDF...";
+    previewWindow.document.body.innerHTML =
+      '<p style="font:16px -apple-system,BlinkMacSystemFont,sans-serif;padding:24px;">Preparing your quotation PDF...</p>';
+  } catch (error) {
+    // The PDF can still be navigated to even if Safari restricts blank-tab DOM access.
+  }
+
+  return previewWindow;
+}
+
+function previewPDF(bytes, fileName, iosPreviewWindow = null) {
   if (!bytes) throw new Error("PDF document was not generated.");
 
   const blob =
@@ -1054,6 +1081,21 @@ function previewPDF(bytes, fileName) {
       : new Blob([bytes], { type: "application/pdf" });
 
   const url = URL.createObjectURL(blob);
+
+  // Do not revoke this URL while the native iOS PDF viewer is using it.
+  // The opener page owns the Blob URL, so retain it for the page lifetime.
+  if (iosPreviewWindow && !iosPreviewWindow.closed) {
+    iosPreviewWindow.location.replace(url);
+    return;
+  }
+
+  // If the user closed the prepared iOS tab while the PDF was generating,
+  // fall back to the existing preview modal rather than leaving no preview.
+  if (iosPreviewWindow && iosPreviewWindow.closed) {
+    openPdfPreviewModal(fileName);
+  }
+
+  // Existing desktop and Android iframe preview remains unchanged.
   const modal = getOrCreatePdfPreviewModal();
   const frame = document.getElementById("pdfPreviewFrame");
   const downloadButton = document.getElementById("pdfPreviewDownload");
@@ -1070,7 +1112,15 @@ function previewPDF(bytes, fileName) {
 }
 
 async function generateAndPreviewTemplatePDF(data, fileName) {
-  openPdfPreviewModal(fileName);
+  const useIOSNativeViewer = isIOSDevice();
+
+  // Open the tab immediately during the click event to avoid iOS popup blocking.
+  const iosPreviewWindow = useIOSNativeViewer ? openIOSPdfTab() : null;
+
+  // If Safari blocks the new tab, retain the existing modal as a fallback.
+  if (!useIOSNativeViewer || !iosPreviewWindow) {
+    openPdfPreviewModal(fileName);
+  }
 
   try {
     const pdfDoc = await buildTemplateQuotation(data);
@@ -1078,24 +1128,32 @@ async function generateAndPreviewTemplatePDF(data, fileName) {
       useObjectStreams: true,
       objectsPerTick: Infinity,
     });
-    previewPDF(bytes, fileName);
+
+    previewPDF(bytes, fileName, iosPreviewWindow);
   } catch (error) {
     console.error("Quotation PDF error:", error);
+
+    if (iosPreviewWindow && !iosPreviewWindow.closed) {
+      iosPreviewWindow.close();
+    }
+
     const modal = document.getElementById("pdfPreviewModal");
     if (modal?._close) modal._close();
+
     alert(`Unable to generate the quotation PDF.\n\n${error.message}`);
   }
 }
 
 function preloadQuotationAssets() {
-  // Warm the large template while the dealer is entering form data, so the
-  // Preview button does not have to wait for a 10 MB download.
+  // Warm the large template while the dealer is entering form data, so Preview does not
+  // have to wait for a large template download after the dealer clicks the button.
   loadQuotationTemplate().catch(() => {});
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   setTodayDate();
   lockChannelPartnerPrefix();
+
   // Start warming the PDF assets immediately so Preview does not wait for the
   // template download after the dealer clicks the button.
   preloadQuotationAssets();
