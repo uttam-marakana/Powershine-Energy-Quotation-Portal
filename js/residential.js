@@ -7,11 +7,7 @@ const PANEL_WATT_OPTIONS = {
   },
   Waaree: {
     Bifacial: [530, 540, 545],
-    Topcon: [
-      580,
-      610,
-      ...Array.from({ length: 20 }, (_, index) => 615 + index * 5),
-    ],
+    Topcon: [580, 610, 700, 710],
   },
   Adani: {
     Bifacial: [540, 545, 550, 555],

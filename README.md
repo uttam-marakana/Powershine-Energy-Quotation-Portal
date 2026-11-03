@@ -146,15 +146,16 @@ Configured combinations documented by the project are:
 
 | Panel brand | Panel type | Supported wattage       |
 | ----------- | ---------- | ----------------------- |
-| APS         | Bifacial   | 550 W                   |
+| APS         | Bifacial   | 540 W, 545 W, and 550 W |
 | APS         | TOPCon     | 600 W                   |
-| Waaree      | Bifacial   | 530–540 W in 5 W steps  |
-| Waaree      | TOPCon     | 580–610 W in 5 W steps  |
-| Adani       | Bifacial   | 550 W and 555 W         |
+| Waaree      | Bifacial   | 530 W, 540 W, and 545 W |
+| Waaree      | TOPCon     | 580 W, 610 W, 700 W, and 710 W |
+| Adani       | Bifacial   | 540 W, 545 W, 550 W, and 555 W |
 | Adani       | TOPCon     | 610 W, 615 W, and 620 W |
+| Solarium    | Bifacial   | No wattage options      |
 | Solarium    | TOPCon     | 720 W                   |
 
-If an unsupported brand/type combination is selected, the wattage list should not be treated as a free-form calculation input. Keep the brand/type/wattage rules aligned with `buildPanelWattOptions()` and `updatePanelWattOptions()` in `js/residential.js`.
+If an unsupported brand/type combination is selected, the wattage list should not be treated as a free-form calculation input. Keep the brand/type/wattage rules aligned with `PANEL_WATT_OPTIONS` and `updatePanelWattOptions()` in `js/residential.js`.
 
 **Subsidy is a reference value.** The current business rule states that subsidy is shown for reference and is not directly subtracted from the quotation to calculate what the customer pays. The customer payable amount includes the quotation amount and applicable charges.
 
