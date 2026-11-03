@@ -1,40 +1,26 @@
 // Panel wattage is intentionally the only dependent dropdown.
 // Panel Brand and Panel Type remain radio-button fields.
-const PANEL_WATT_RANGES = {
+const PANEL_WATT_OPTIONS = {
   Aps: {
-    Bifacial: { min: 550, max: 550 },
-    Topcon: { min: 600, max: 600 },
+    Bifacial: [540, 545, 550],
+    Topcon: [600],
   },
   Waaree: {
-    Bifacial: { min: 530, max: 540 },
-    Topcon: { min: 580, max: 610 },
+    Bifacial: [530, 540, 545],
+    Topcon: [
+      580,
+      610,
+      ...Array.from({ length: 20 }, (_, index) => 615 + index * 5),
+    ],
   },
   Adani: {
-    Bifacial: { min: 550, max: 555 },
-    Topcon: { min: 610, max: 620 },
+    Bifacial: [540, 545, 550, 555],
+    Topcon: [610, 615, 620],
   },
   Solarium: {
-    Topcon: { min: 720, max: 720 },
+    Topcon: [720],
   },
 };
-
-const PANEL_WATT_STEP = 5;
-
-function buildPanelWattOptions(range) {
-  if (!range) return [];
-  const values = [];
-  for (let watt = range.min; watt <= range.max; watt += PANEL_WATT_STEP) {
-    values.push(watt);
-  }
-  if (
-    values.length &&
-    values[values.length - 1] !== range.max &&
-    range.max > values[values.length - 1]
-  ) {
-    values.push(range.max);
-  }
-  return values;
-}
 
 function updatePanelWattOptions() {
   const panelWatt = document.getElementById("panelWatt");
@@ -42,8 +28,7 @@ function updatePanelWattOptions() {
 
   const brand = getRadioValue("panelBrand");
   const panelType = getRadioValue("panelType");
-  const range = PANEL_WATT_RANGES[brand]?.[panelType];
-  const options = buildPanelWattOptions(range);
+  const options = PANEL_WATT_OPTIONS[brand]?.[panelType] ?? [];
   const previousValue = panelWatt.value;
 
   panelWatt.innerHTML = "";
