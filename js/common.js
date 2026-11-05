@@ -208,6 +208,33 @@ function createQuotationId(prefix = "PSE") {
   return `${prefix}-${stamp}`;
 }
 
+function pdfFontSafeText(pdfDoc, text, font) {
+  const unsupportedCharacters =
+    pdfDoc.__unsupportedTextCharacters ||
+    (pdfDoc.__unsupportedTextCharacters = new Set());
+
+  return Array.from(String(text ?? ""), (character) => {
+    if (character === "₹" && pdfDoc.__rupeeGlyph) return character;
+
+    try {
+      font.encodeText(character);
+      return character;
+    } catch (error) {
+      if (!error.message?.includes("WinAnsi cannot encode")) throw error;
+      unsupportedCharacters.add(character);
+      return "?";
+    }
+  }).join("");
+}
+
+function pdfTextWidth(pdfDoc, font, text, size) {
+  const source = pdfFontSafeText(pdfDoc, text, font);
+  return (
+    font.widthOfTextAtSize(source.replace(/₹/g, "Rs."), size) +
+    (source.includes("₹") ? size * 0.05 : 0)
+  );
+}
+
 function drawPdfTextLine(pdfDoc, page, text, x, y, options = {}) {
   const { size = 9, bold = false, color = [0.12, 0.12, 0.12] } = options;
   const font = pdfDoc.__fonts[bold ? "bold" : "regular"];
@@ -215,8 +242,9 @@ function drawPdfTextLine(pdfDoc, page, text, x, y, options = {}) {
   const rgb = PDFLib.rgb(...color);
 
   if (!source.includes("₹") || !pdfDoc.__rupeeGlyph) {
-    page.drawText(source, { x, y, size, font, color: rgb });
-    return font.widthOfTextAtSize(source, size);
+    const safeSource = pdfFontSafeText(pdfDoc, source, font);
+    page.drawText(safeSource, { x, y, size, font, color: rgb });
+    return font.widthOfTextAtSize(safeSource, size);
   }
 
   let cursorX = x;
@@ -235,8 +263,9 @@ function drawPdfTextLine(pdfDoc, page, text, x, y, options = {}) {
     }
 
     if (part) {
-      page.drawText(part, { x: cursorX, y, size, font, color: rgb });
-      cursorX += font.widthOfTextAtSize(part, size);
+      const safePart = pdfFontSafeText(pdfDoc, part, font);
+      page.drawText(safePart, { x: cursorX, y, size, font, color: rgb });
+      cursorX += font.widthOfTextAtSize(safePart, size);
     }
   });
 
@@ -265,8 +294,7 @@ function pdfText(pdfDoc, page, text, x, y, options = {}) {
 
       for (const word of words) {
         const candidate = line ? `${line} ${word}` : word;
-        const measured = candidate.replace(/₹/g, "Rs.");
-        if (!line || font.widthOfTextAtSize(measured, size) <= maxWidth) {
+        if (!line || pdfTextWidth(pdfDoc, font, candidate, size) <= maxWidth) {
           line = candidate;
         } else {
           lines.push(line);
@@ -298,9 +326,7 @@ function pdfRightText(pdfDoc, page, text, rightX, y, options = {}) {
 
   const source = String(text ?? "");
   const font = pdfDoc.__fonts[bold ? "bold" : "regular"];
-  const width =
-    font.widthOfTextAtSize(source.replace(/₹/g, "Rs."), size) +
-    (source.includes("₹") ? size * 0.05 : 0);
+  const width = pdfTextWidth(pdfDoc, font, source, size);
   drawPdfTextLine(pdfDoc, page, source, rightX - width, y, {
     size,
     bold,
@@ -323,9 +349,7 @@ function pdfColumnText(pdfDoc, page, text, bounds, y, options = {}) {
   const font = pdfDoc.__fonts[bold ? "bold" : "regular"];
   const available = Math.max(1, bounds.right - bounds.left);
   let drawSize = size;
-  const measure = (value) =>
-    font.widthOfTextAtSize(value.replace(/₹/g, "Rs."), drawSize) +
-    (value.includes("₹") ? drawSize * 0.05 : 0);
+  const measure = (value) => pdfTextWidth(pdfDoc, font, value, drawSize);
 
   while (drawSize > minSize && measure(source) > available) {
     drawSize -= 0.2;
@@ -1112,6 +1136,13 @@ async function generateAndPreviewTemplatePDF(data, fileName) {
       useObjectStreams: !useIOSNativeViewer,
       objectsPerTick: Infinity,
     });
+
+    if (pdfDoc.__unsupportedTextCharacters?.size) {
+      console.warn(
+        "Some quotation characters are not supported by the PDF font and were replaced with '?':",
+        [...pdfDoc.__unsupportedTextCharacters],
+      );
+    }
 
     previewPDF(bytes, fileName, iosPreviewWindow);
   } catch (error) {

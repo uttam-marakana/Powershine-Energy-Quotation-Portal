@@ -257,6 +257,8 @@ The shared PDF code owns the template loading, text placement, currency handling
 
 The project uses `pdf-lib` for PDF operations. The shared code includes a workaround for rendering the Indian Rupee symbol when standard PDF font encoding cannot represent it directly. Preserve this logic when changing PDF generation; removing it may reintroduce a currency-encoding error.
 
+The built-in PDF fonts cannot represent every Unicode character. Unsupported characters in dealer-entered text are replaced with `?` rather than failing PDF generation, and the browser console lists any replacements.
+
 ## Validation and business rules
 
 The following rules are important to preserve during future changes:
