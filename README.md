@@ -92,7 +92,7 @@ The shared code in `js/common.js` loads the seven-page template at `docs/powersh
 
 ### 7. Preview the PDF
 
-The portal displays the generated PDF in a preview modal on desktop and Android. On iOS, the PDF opens in Safari's native viewer in the current tab. The dealer should verify customer details, quotation values, optional charges, creator information, and the final total before sharing the document.
+The portal displays the generated PDF in a preview modal on desktop and Android. On iOS, the PDF opens in a separate tab in Safari's native viewer while the form page remains open. The dealer should verify customer details, quotation values, optional charges, creator information, and the final total before sharing the document.
 
 ### 8. Download the PDF
 
@@ -300,7 +300,7 @@ The generated PDF template also contains company address, banking, terms, and co
 - Confirm the browser can load the pdf-lib CDN dependency.
 - The template is fetched without browser caching, and Vercel sends a no-store response header for it. If deploying to another host, configure the same cache policy for `docs/powershine-template.pdf`.
 - Preserve the version query in `js/common.js` when changing the template.
-- On iOS, the generated PDF opens in Safari's native viewer in the current tab; use Back to return to the form.
+- On iOS, the generated PDF opens in a separate tab in Safari's native viewer. The form page stays open in its original tab.
 
 ### `Cannot read properties of null` in the browser console
 

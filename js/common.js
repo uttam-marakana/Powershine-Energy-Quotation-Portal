@@ -1055,7 +1055,12 @@ function isIOSDevice() {
   );
 }
 
-function previewPDF(bytes, fileName, useIOSNativeViewer = false) {
+function openIOSPdfTab() {
+  // Open synchronously from the Generate button click so Safari allows the tab.
+  return window.open("about:blank", "_blank");
+}
+
+function previewPDF(bytes, fileName, iosPreviewWindow = null) {
   if (!bytes) throw new Error("PDF document was not generated.");
 
   const blob =
@@ -1065,11 +1070,15 @@ function previewPDF(bytes, fileName, useIOSNativeViewer = false) {
 
   const url = URL.createObjectURL(blob);
 
-  // Use the current browsing context on iOS; Safari can fail to render a Blob
-  // PDF when it is handed off to a separately opened tab.
-  if (useIOSNativeViewer) {
-    window.location.assign(url);
+  // Keep the generating page alive as the Blob URL's owner while Safari loads
+  // the PDF in its native viewer.
+  if (iosPreviewWindow && !iosPreviewWindow.closed) {
+    iosPreviewWindow.location.replace(url);
     return;
+  }
+
+  if (iosPreviewWindow?.closed) {
+    openPdfPreviewModal(fileName);
   }
 
   // Existing desktop and Android iframe preview remains unchanged.
@@ -1090,21 +1099,27 @@ function previewPDF(bytes, fileName, useIOSNativeViewer = false) {
 
 async function generateAndPreviewTemplatePDF(data, fileName) {
   const useIOSNativeViewer = isIOSDevice();
+  const iosPreviewWindow = useIOSNativeViewer ? openIOSPdfTab() : null;
 
-  if (!useIOSNativeViewer) {
+  if (!useIOSNativeViewer || !iosPreviewWindow) {
     openPdfPreviewModal(fileName);
   }
 
   try {
     const pdfDoc = await buildTemplateQuotation(data);
     const bytes = await pdfDoc.save({
-      useObjectStreams: true,
+      // Avoid compressed object streams for compatibility with older iOS PDFKit.
+      useObjectStreams: !useIOSNativeViewer,
       objectsPerTick: Infinity,
     });
 
-    previewPDF(bytes, fileName, useIOSNativeViewer);
+    previewPDF(bytes, fileName, iosPreviewWindow);
   } catch (error) {
     console.error("Quotation PDF error:", error);
+
+    if (iosPreviewWindow && !iosPreviewWindow.closed) {
+      iosPreviewWindow.close();
+    }
 
     const modal = document.getElementById("pdfPreviewModal");
     if (modal?._close) modal._close();
