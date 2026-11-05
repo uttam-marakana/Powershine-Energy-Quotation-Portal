@@ -1,4 +1,4 @@
-const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=33-20261105";
+const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=34-20261105";
 
 // Channel Partner Code: the "CP-" prefix is fixed; dealers only type what follows it.
 const CP_PREFIX = "CP-";
@@ -366,7 +366,7 @@ let quotationTemplateBytesPromise = null;
 function loadQuotationTemplate() {
   if (!quotationTemplateBytesPromise) {
     quotationTemplateBytesPromise = fetch(QUOTATION_TEMPLATE_URL, {
-      cache: "force-cache",
+      cache: "no-store",
     })
       .then((response) => {
         if (!response.ok) {
@@ -1055,24 +1055,7 @@ function isIOSDevice() {
   );
 }
 
-function openIOSPdfTab() {
-  // This must run synchronously from the user's Generate PDF click, before
-  // the first await, otherwise Safari may block the new tab as a popup.
-  const previewWindow = window.open("about:blank", "_blank");
-  if (!previewWindow) return null;
-
-  try {
-    previewWindow.document.title = "Preparing quotation PDF...";
-    previewWindow.document.body.innerHTML =
-      '<p style="font:16px -apple-system,BlinkMacSystemFont,sans-serif;padding:24px;">Preparing your quotation PDF...</p>';
-  } catch (error) {
-    // The PDF can still be navigated to even if Safari restricts blank-tab DOM access.
-  }
-
-  return previewWindow;
-}
-
-function previewPDF(bytes, fileName, iosPreviewWindow = null) {
+function previewPDF(bytes, fileName, useIOSNativeViewer = false) {
   if (!bytes) throw new Error("PDF document was not generated.");
 
   const blob =
@@ -1082,17 +1065,11 @@ function previewPDF(bytes, fileName, iosPreviewWindow = null) {
 
   const url = URL.createObjectURL(blob);
 
-  // Do not revoke this URL while the native iOS PDF viewer is using it.
-  // The opener page owns the Blob URL, so retain it for the page lifetime.
-  if (iosPreviewWindow && !iosPreviewWindow.closed) {
-    iosPreviewWindow.location.replace(url);
+  // Use the current browsing context on iOS; Safari can fail to render a Blob
+  // PDF when it is handed off to a separately opened tab.
+  if (useIOSNativeViewer) {
+    window.location.assign(url);
     return;
-  }
-
-  // If the user closed the prepared iOS tab while the PDF was generating,
-  // fall back to the existing preview modal rather than leaving no preview.
-  if (iosPreviewWindow && iosPreviewWindow.closed) {
-    openPdfPreviewModal(fileName);
   }
 
   // Existing desktop and Android iframe preview remains unchanged.
@@ -1114,11 +1091,7 @@ function previewPDF(bytes, fileName, iosPreviewWindow = null) {
 async function generateAndPreviewTemplatePDF(data, fileName) {
   const useIOSNativeViewer = isIOSDevice();
 
-  // Open the tab immediately during the click event to avoid iOS popup blocking.
-  const iosPreviewWindow = useIOSNativeViewer ? openIOSPdfTab() : null;
-
-  // If Safari blocks the new tab, retain the existing modal as a fallback.
-  if (!useIOSNativeViewer || !iosPreviewWindow) {
+  if (!useIOSNativeViewer) {
     openPdfPreviewModal(fileName);
   }
 
@@ -1129,13 +1102,9 @@ async function generateAndPreviewTemplatePDF(data, fileName) {
       objectsPerTick: Infinity,
     });
 
-    previewPDF(bytes, fileName, iosPreviewWindow);
+    previewPDF(bytes, fileName, useIOSNativeViewer);
   } catch (error) {
     console.error("Quotation PDF error:", error);
-
-    if (iosPreviewWindow && !iosPreviewWindow.closed) {
-      iosPreviewWindow.close();
-    }
 
     const modal = document.getElementById("pdfPreviewModal");
     if (modal?._close) modal._close();

@@ -27,11 +27,12 @@ index.html
                                                                js/common.js
                                                    shared helpers + quotation model
                                                                      ↓
-                                                     assets/quotation-template.pdf
+                                                      docs/powershine-template.pdf
                                                                      ↓
                                                     dynamic quotation PDF generation
                                                                      ↓
-                                                       preview modal / PDF download
+                                              browser preview / native iOS preview
+                                                            / PDF download
 
 
 ## Project structure
@@ -87,11 +88,11 @@ The form-specific script maps the entered fields into a common quotation data ob
 
 ### 6. Build the PDF
 
-The shared code in `js/common.js` loads the six-page template at `assets/quotation-template.pdf`, overlays the dynamic quotation details, and creates a PDF in the browser. The form's field values are mapped to the quotation page; the rest of the template supplies the fixed branded pages.
+The shared code in `js/common.js` loads the seven-page template at `docs/powershine-template.pdf`, overlays the dynamic quotation details, and creates a PDF in the browser. The form's field values are mapped to the quotation page; the rest of the template supplies the fixed branded pages.
 
 ### 7. Preview the PDF
 
-The portal displays the generated PDF in its preview modal. The dealer should verify customer details, quotation values, optional charges, creator information, and the final total before sharing the document.
+The portal displays the generated PDF in a preview modal on desktop and Android. On iOS, the PDF opens in Safari's native viewer in the current tab. The dealer should verify customer details, quotation values, optional charges, creator information, and the final total before sharing the document.
 
 ### 8. Download the PDF
 
@@ -227,20 +228,11 @@ The quotation may display Plant Size, Panel Brand, Panel Quantity, and Panel Wat
 
 ## Shared PDF generation
 
-Both forms use the shared PDF-generation code in `js/common.js` and the template at `assets/quotation-template.pdf`.
+Both forms use the shared PDF-generation code in `js/common.js` and the template at `docs/powershine-template.pdf`.
 
 ### Template pages
 
-The approved template is documented as six pages:
-
-1. Cover page
-2. About PowerShine Energy
-3. Product Photos
-4. Dynamic Quotation page
-5. Notes, Bank Details, and Terms & Conditions
-6. Thank You page
-
-The fixed pages contain the brand artwork and business information. The dynamic quotation page is populated from the form data.
+The current template contains seven pages. The dynamic quotation page is populated from the form data; the remaining pages contain fixed brand artwork and business information.
 
 ### PDF data mapping
 
@@ -303,10 +295,12 @@ The generated PDF template also contains company address, banking, terms, and co
 
 ### PDF preview is blank or the template cannot be loaded
 
-- Verify that `assets/quotation-template.pdf` exists in the deployed root and is accessible by URL.
+- Verify that `docs/powershine-template.pdf` exists in the deployed root and is accessible by URL.
 - Check the browser Network panel for 404, blocked requests, or cache issues.
 - Confirm the browser can load the pdf-lib CDN dependency.
-- Preserve the template URL/versioning behavior in `js/common.js` when changing the template.
+- The template is fetched without browser caching, and Vercel sends a no-store response header for it. If deploying to another host, configure the same cache policy for `docs/powershine-template.pdf`.
+- Preserve the version query in `js/common.js` when changing the template.
+- On iOS, the generated PDF opens in Safari's native viewer in the current tab; use Back to return to the form.
 
 ### `Cannot read properties of null` in the browser console
 
