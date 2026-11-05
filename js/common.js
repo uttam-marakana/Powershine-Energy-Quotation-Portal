@@ -1,4 +1,4 @@
-const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=34-20261105";
+const QUOTATION_TEMPLATE_URL = "docs/powershine-template.pdf?v=35-20261105";
 
 // Channel Partner Code: the "CP-" prefix is fixed; dealers only type what follows it.
 const CP_PREFIX = "CP-";
