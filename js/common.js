@@ -1121,6 +1121,28 @@ function previewPDF(bytes, fileName, iosPreviewWindow = null) {
   document.addEventListener("keydown", modal._handleEscape);
 }
 
+async function saveQuotationLog(data) {
+  const response = await fetch("/api/log-quotation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      quotation: data,
+      website: document.getElementById("quotationWebsite")?.value || "",
+    }),
+  });
+
+  if (!response.ok) {
+    let message = "The quotation could not be saved to the log.";
+    try {
+      const result = await response.json();
+      if (typeof result.error === "string") message = result.error;
+    } catch (error) {
+      console.error("Unable to read the quotation logging error response:", error);
+    }
+    throw new Error(message);
+  }
+}
+
 async function generateAndPreviewTemplatePDF(data, fileName) {
   const useIOSNativeViewer = isIOSDevice();
   const iosPreviewWindow = useIOSNativeViewer ? openIOSPdfTab() : null;
@@ -1145,6 +1167,14 @@ async function generateAndPreviewTemplatePDF(data, fileName) {
     }
 
     previewPDF(bytes, fileName, iosPreviewWindow);
+    try {
+      await saveQuotationLog(data);
+    } catch (error) {
+      console.error("Quotation was generated but could not be logged:", error);
+      alert(
+        `The PDF was generated, but the quotation could not be saved to the log.\n\n${error.message}`,
+      );
+    }
   } catch (error) {
     console.error("Quotation PDF error:", error);
 

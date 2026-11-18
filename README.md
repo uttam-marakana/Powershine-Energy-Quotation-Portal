@@ -33,6 +33,10 @@ index.html
                                                                      ↓
                                               browser preview / native iOS preview
                                                             / PDF download
+                                                                     ↓
+                                                   /api/log-quotation (Vercel)
+                                                                     ↓
+                                                            Google Sheets
 
 
 ## Project structure
@@ -41,6 +45,8 @@ powershine-energy-quotation-portal/
 ├── index.html
 ├── residential.html
 ├── commercial.html
+├── api/
+│   └── log-quotation.js
 ├── css/
 │   └── style.css
 ├── js/
@@ -97,6 +103,27 @@ The portal displays the generated PDF in a preview modal on desktop and Android.
 ### 8. Download the PDF
 
 The dealer downloads the generated PDF using the provided download action. The downloaded document contains the fixed template pages plus the generated quotation details.
+
+After PDF generation succeeds, the portal also sends a summary record to `/api/log-quotation`. The Vercel function validates the request and appends the record to the configured Google Sheet. A sheet-write failure does not block the PDF; the portal reports the failure so the dealer knows the record was not saved.
+
+### Configure quotation logging
+
+1. Create a Google Cloud service account and enable the Google Sheets API for its project.
+2. Create a private Google spreadsheet with a tab named `Quotations`. Add this header row in columns A–O:
+
+   `Created At`, `Quotation ID`, `Type`, `Quotation Date`, `Customer Name`, `Business Name`, `Customer Phone`, `City`, `Created By`, `Creator Phone`, `Channel Partner Code`, `Capacity`, `Subtotal`, `Tax`, `Grand Total`
+
+3. Share the spreadsheet with the service account's email address and grant Editor access. Do not make the spreadsheet public.
+4. In the Vercel project, add these environment variables for the deployment environments you use:
+   - `APP_ORIGIN`: the exact public portal origin, such as `https://quotes.example.com` (no path).
+   - `GOOGLE_SHEETS_SPREADSHEET_ID`: the ID from the spreadsheet URL.
+   - `GOOGLE_SERVICE_ACCOUNT_JSON`: the complete service account JSON key. Keep it only in Vercel's encrypted environment variables; never commit it or expose it in browser code.
+   - `GOOGLE_SHEETS_TAB`: optional; defaults to `Quotations`.
+5. Redeploy after setting or changing environment variables. For local testing, use Vercel's local development environment with the same variables.
+
+The endpoint accepts same-origin JSON POST requests only, validates field sizes and required quotation data, and includes a hidden honeypot field as basic abuse protection. The portal has no dealer login, so these checks do not provide user authentication or strong rate limiting. Add dealer authentication and persistent rate limiting before treating the endpoint as restricted to named users.
+
+Each successful quotation adds one row to the same sheet tab. The log stores the summary fields above, not the generated PDF or every technical form input.
 
 Open portal
    ↓
@@ -276,7 +303,7 @@ The following rules are important to preserve during future changes:
 11. Positive optional charges are included in both the total and the PDF.
 12. Channel Partner Code uses the `CP-` prefix behavior implemented in `js/common.js`; retain prefix locking and validation when editing the forms.
 13. Both forms must continue using the shared PDF template and shared PDF-generation functions.
-14. Do not infer or create a backend, email-sending service, database, or other feature that is not present in the static project.
+14. Quotation logging uses the Vercel endpoint and Google Sheets configuration described above; never move Google credentials into frontend code.
 
 ## Branding and template assets
 
@@ -328,22 +355,21 @@ Do not remove or bypass the currency-rendering workaround in `js/common.js` with
 
 The current version provides:
 
-- Static form pages
+- Static form pages and a small Vercel serverless logging endpoint
 - Client-side validation and calculations
 - In-browser PDF generation
 - PDF preview and download
+- Optional Google Sheets quotation logging when deployment environment variables are configured
 - Shared branding and quotation template
 
 The current version does **not** provide:
 
-- Backend APIs or server-side calculations
-- Database storage of customers or quotations
 - Authentication, roles, or dealer-specific access control
+- Strong distributed rate limiting
 - Email sending or automated email delivery
-- Cloud-based quotation history or audit logs
 - Automatic verification of customer-entered business information
 
-If these capabilities are required later, they should be planned as separate features rather than assumed to exist in the current frontend-only portal.
+Google Sheets logging must be configured in Vercel before it is active. The endpoint is not an authentication system; anyone who can access the portal can submit a quotation log.
 
 ## Maintaining the project
 

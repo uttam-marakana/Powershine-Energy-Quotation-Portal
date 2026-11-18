@@ -387,6 +387,14 @@ body {
   color: var(--primary-dark);
 }
 
+.quotation-log-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .form-actions {
   display: flex;
   gap: 1rem;
