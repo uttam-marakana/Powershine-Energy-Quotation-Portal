@@ -47,6 +47,8 @@ powershine-energy-quotation-portal/
 ├── commercial.html
 ├── api/
 │   └── log-quotation.js
+├── apps-script/
+│   └── log-quotation.gs
 ├── css/
 │   └── style.css
 ├── js/
@@ -106,22 +108,28 @@ The dealer downloads the generated PDF using the provided download action. The d
 
 After PDF generation succeeds, the portal also sends a summary record to `/api/log-quotation`. The Vercel function validates the request and appends the record to the configured Google Sheet. A sheet-write failure does not block the PDF; the portal reports the failure so the dealer knows the record was not saved.
 
-### Configure quotation logging
+### Configure quotation logging with Google Apps Script
 
-1. Create a Google Cloud service account and enable the Google Sheets API for its project.
-2. Create a private Google spreadsheet with a tab named `Quotations`. Add this header row in columns A–O:
+This integration does not require a Google Cloud service-account key. The Apps Script runs as your Google account and appends rows to the spreadsheet you own.
+
+1. Create a private Google spreadsheet with a tab named `Quotations`. Add this header row in columns A–O:
 
    `Created At`, `Quotation ID`, `Type`, `Quotation Date`, `Customer Name`, `Business Name`, `Customer Phone`, `City`, `Created By`, `Creator Phone`, `Channel Partner Code`, `Capacity`, `Subtotal`, `Tax`, `Grand Total`
 
-3. Share the spreadsheet with the service account's email address and grant Editor access. Do not make the spreadsheet public.
-4. In the Vercel project, add these environment variables for the deployment environments you use:
+2. In the spreadsheet, open **Extensions → Apps Script**. Replace the editor contents with [`apps-script/log-quotation.gs`](./apps-script/log-quotation.gs), then save the project.
+3. In Apps Script **Project Settings → Script Properties**, add:
+   - `SPREADSHEET_ID`: the ID from the spreadsheet URL (the text between `/d/` and `/edit`).
+   - `SHEET_TAB`: `Quotations`.
+   - `WEBHOOK_SECRET`: a new, long random secret. Generate one locally, for example with `openssl rand -hex 32`. Use the same value in Vercel; do not put it in the Apps Script source file or share it publicly.
+4. In Apps Script, choose **Deploy → New deployment → Web app**. Set **Execute as** to your account and **Who has access** to **Anyone**, then deploy and authorize access to the spreadsheet. Copy the deployed URL ending in `/exec`. Do not deploy a development `/dev` URL.
+   - The web-app URL is publicly reachable, but the script checks `WEBHOOK_SECRET` before writing. If your organization disables public Apps Script web apps, ask your administrator which approved option to use; do not bypass the policy.
+5. In the Vercel project, add these environment variables for the deployment environments you use:
    - `APP_ORIGIN`: the exact public portal origin, such as `https://quotes.example.com` (no path).
-   - `GOOGLE_SHEETS_SPREADSHEET_ID`: the ID from the spreadsheet URL.
-   - `GOOGLE_SERVICE_ACCOUNT_JSON`: the complete service account JSON key. Keep it only in Vercel's encrypted environment variables; never commit it or expose it in browser code.
-   - `GOOGLE_SHEETS_TAB`: optional; defaults to `Quotations`.
-5. Redeploy after setting or changing environment variables. For local testing, use Vercel's local development environment with the same variables.
+   - `GOOGLE_APPS_SCRIPT_URL`: the deployed Apps Script `/exec` URL.
+   - `GOOGLE_APPS_SCRIPT_SECRET`: the exact same secret as the Apps Script `WEBHOOK_SECRET` property.
+6. Remove any old `GOOGLE_SERVICE_ACCOUNT_JSON`, `GOOGLE_SHEETS_SPREADSHEET_ID`, and `GOOGLE_SHEETS_TAB` Vercel variables; they are not used by this integration. Redeploy after setting or changing environment variables.
 
-The endpoint accepts same-origin JSON POST requests only, validates field sizes and required quotation data, and includes a hidden honeypot field as basic abuse protection. The portal has no dealer login, so these checks do not provide user authentication or strong rate limiting. Add dealer authentication and persistent rate limiting before treating the endpoint as restricted to named users.
+The Vercel endpoint accepts same-origin JSON POST requests, validates field sizes and required quotation data, and includes a hidden honeypot field as basic abuse protection. The shared secret is sent only server-to-server and must not be added to frontend code. The portal has no dealer login, so these checks do not provide user authentication or strong rate limiting; anyone can submit a request to the public Vercel endpoint. Add dealer authentication and persistent rate limiting before treating the endpoint as restricted to named users.
 
 Each successful quotation adds one row to the same sheet tab. The log stores the summary fields above, not the generated PDF or every technical form input.
 

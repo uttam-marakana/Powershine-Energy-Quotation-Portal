@@ -1,8 +1,5 @@
-const crypto = require("node:crypto");
-
 const MAX_BODY_BYTES = 16 * 1024;
 const MAX_FIELD_LENGTH = 200;
-const tokenCache = { value: "", expiresAt: 0 };
 
 class RequestError extends Error {
   constructor(statusCode, message) {
@@ -31,9 +28,7 @@ async function readJsonBody(request) {
       }
     }
 
-    if (
-      Buffer.byteLength(JSON.stringify(request.body)) > MAX_BODY_BYTES
-    ) {
+    if (Buffer.byteLength(JSON.stringify(request.body)) > MAX_BODY_BYTES) {
       throw new RequestError(413, "Request body is too large.");
     }
     return request.body;
@@ -41,7 +36,6 @@ async function readJsonBody(request) {
 
   let body = "";
   let size = 0;
-
   for await (const chunk of request) {
     size += chunk.length;
     if (size > MAX_BODY_BYTES) {
@@ -107,7 +101,7 @@ function validateQuotation(value) {
     throw new RequestError(400, "Customer name and phone are required.");
   }
 
-  const columns = [
+  return [
     new Date().toISOString(),
     quotationId,
     type,
@@ -124,109 +118,51 @@ function validateQuotation(value) {
     requireString(value.tax ?? "", "tax", 40),
     requireString(value.grandTotal ?? "", "grand total", 40),
   ];
-
-  return columns;
-}
-
-function encodeBase64Url(value) {
-  return Buffer.from(value).toString("base64url");
-}
-
-async function getGoogleAccessToken(serviceAccount) {
-  if (tokenCache.value && tokenCache.expiresAt > Date.now()) {
-    return tokenCache.value;
-  }
-
-  const tokenUrl = serviceAccount.token_uri || "https://oauth2.googleapis.com/token";
-  const issuedAt = Math.floor(Date.now() / 1000);
-  const unsignedToken = [
-    encodeBase64Url(JSON.stringify({ alg: "RS256", typ: "JWT" })),
-    encodeBase64Url(
-      JSON.stringify({
-        iss: serviceAccount.client_email,
-        scope: "https://www.googleapis.com/auth/spreadsheets",
-        aud: tokenUrl,
-        iat: issuedAt,
-        exp: issuedAt + 3600,
-      }),
-    ),
-  ].join(".");
-
-  const signer = crypto.createSign("RSA-SHA256");
-  signer.update(unsignedToken);
-  signer.end();
-  const assertion = `${unsignedToken}.${signer.sign(serviceAccount.private_key, "base64url")}`;
-
-  const response = await fetch(tokenUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion,
-    }),
-  });
-
-  if (!response.ok) {
-    console.error("Google OAuth token request failed:", response.status);
-    throw new Error("Unable to authenticate with Google Sheets.");
-  }
-
-  const tokenData = await response.json();
-  const expiresIn = Number(tokenData.expires_in);
-  if (
-    typeof tokenData.access_token !== "string" ||
-    !Number.isFinite(expiresIn) ||
-    expiresIn <= 0
-  ) {
-    throw new Error("Google OAuth response did not contain an access token.");
-  }
-
-  tokenCache.value = tokenData.access_token;
-  tokenCache.expiresAt = Date.now() + Math.max(1, expiresIn - 60) * 1000;
-  return tokenCache.value;
 }
 
 async function appendQuotationRow(columns) {
-  const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-  const sheetName = process.env.GOOGLE_SHEETS_TAB || "Quotations";
-  let serviceAccount;
+  const endpoint = process.env.GOOGLE_APPS_SCRIPT_URL;
+  const secret = process.env.GOOGLE_APPS_SCRIPT_SECRET;
 
+  if (!endpoint || !secret) {
+    throw new Error("Google Apps Script environment variables are not configured.");
+  }
+
+  let endpointUrl;
   try {
-    serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || "");
+    endpointUrl = new URL(endpoint);
   } catch {
-    throw new Error("Google Sheets service account configuration is invalid.");
+    throw new Error("Google Apps Script URL is invalid.");
   }
 
   if (
-    !spreadsheetId ||
-    !serviceAccount ||
-    typeof serviceAccount !== "object" ||
-    typeof serviceAccount.client_email !== "string" ||
-    typeof serviceAccount.private_key !== "string"
+    endpointUrl.protocol !== "https:" ||
+    endpointUrl.hostname !== "script.google.com"
   ) {
-    throw new Error("Google Sheets environment variables are not configured.");
+    throw new Error("Google Apps Script URL must be an HTTPS web-app URL.");
   }
 
-  const token = await getGoogleAccessToken(serviceAccount);
-  const range = `'${sheetName.replace(/'/g, "''")}'!A:O`;
-  const endpoint = new URL(
-    `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(range)}:append`,
-  );
-  endpoint.searchParams.set("valueInputOption", "RAW");
-  endpoint.searchParams.set("insertDataOption", "INSERT_ROWS");
-
-  const response = await fetch(endpoint, {
+  const response = await fetch(endpointUrl, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ values: [columns] }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ secret, row: columns }),
   });
 
   if (!response.ok) {
-    console.error("Google Sheets append failed:", response.status);
-    throw new Error("Google Sheets could not save the quotation.");
+    console.error("Google Apps Script request failed:", response.status);
+    throw new Error("Google Apps Script could not save the quotation.");
+  }
+
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("Google Apps Script returned an invalid response.");
+  }
+
+  if (result?.success !== true) {
+    console.error("Google Apps Script rejected the quotation log.");
+    throw new Error("Google Apps Script could not save the quotation.");
   }
 }
 
@@ -275,8 +211,7 @@ module.exports = async function handler(request, response) {
       return sendJson(response, 400, { error: "Quotation could not be saved." });
     }
 
-    const columns = validateQuotation(body.quotation);
-    await appendQuotationRow(columns);
+    await appendQuotationRow(validateQuotation(body.quotation));
     return sendJson(response, 201, { saved: true });
   } catch (error) {
     if (error instanceof RequestError) {
