@@ -64,6 +64,30 @@ function requireString(value, field, maxLength = MAX_FIELD_LENGTH) {
   return cleanValue;
 }
 
+function requirePhone(value, field) {
+  const phone = requireString(value, field, 10);
+  if (!/^\d{10}$/.test(phone)) {
+    throw new RequestError(400, `${field} must contain exactly 10 digits.`);
+  }
+  return phone;
+}
+
+function requireChannelPartnerCode(value) {
+  const code = requireString(value, "channel partner code", 8);
+  if (!/^CP-\d{1,5}$/.test(code)) {
+    throw new RequestError(
+      400,
+      "Channel Partner Code must contain CP- followed by 1 to 5 digits.",
+    );
+  }
+  return code;
+}
+
+function formatCreatedAt(date) {
+  const iso = date.toISOString();
+  return `${iso.slice(0, 10)}  ${iso.slice(11, 19)}`;
+}
+
 function validateQuotation(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new RequestError(400, "Quotation data is required.");
@@ -92,17 +116,23 @@ function validateQuotation(value) {
   }
 
   const customerName = requireString(value.customerName, "customer name");
-  const customerPhone = requireString(
+  const customerPhone = requirePhone(
     value.mobile ?? value.contactNo ?? "",
     "customer phone",
-    30,
   );
   if (!customerName || !customerPhone) {
     throw new RequestError(400, "Customer name and phone are required.");
   }
+  const creatorPhone = requirePhone(
+    value.creatorMobile ?? "",
+    "creator phone",
+  );
+  const channelPartnerCode = requireChannelPartnerCode(
+    value.channelPartnerCode ?? "",
+  );
 
   return [
-    new Date().toISOString(),
+    formatCreatedAt(new Date()),
     quotationId,
     type,
     date,
@@ -111,8 +141,8 @@ function validateQuotation(value) {
     customerPhone,
     requireString(value.city ?? value.customerAddress ?? "", "city"),
     requireString(value.createdBy ?? "", "quotation creator"),
-    requireString(value.creatorMobile ?? "", "creator phone", 30),
-    requireString(value.channelPartnerCode ?? "", "channel partner code", 30),
+    creatorPhone,
+    channelPartnerCode,
     requireString(value.capacity ?? "", "system capacity", 50),
     requireString(value.subTotal ?? "", "subtotal", 40),
     requireString(value.tax ?? "", "tax", 40),
