@@ -39,7 +39,7 @@ function calcCommercial() {
   // Customer enters Grand Total directly. No kW × rate calculation.
   const total = grandTotal + reg + meter + structure;
 
-  setText("sumKW", invKW > 0 ? `${invKW.toFixed(2)} kW` : "—");
+  setText("sumKW", invKW > 0 ? `${invKW.toFixed(2)} KW` : "—");
   setText("sumBase", formatINR(grandTotal));
   setText("sumReg", formatINR(reg));
   setText("sumMeter", formatINR(meter));
@@ -88,7 +88,7 @@ function buildCommercialQuotationData() {
     `Panel watt: ${panelWatt ? `${panelWatt} W` : "—"}`,
     `Inverter brand: ${inverterBrand || "—"}`,
     `Inverter capacity: ${
-      calc.invKW > 0 ? `${calc.invKW.toFixed(2)} kW` : "—"
+      calc.invKW > 0 ? `${calc.invKW.toFixed(2)} KW` : "—"
     }`,
   ].join("\n");
 
@@ -97,7 +97,7 @@ function buildCommercialQuotationData() {
     {
       description: "System Details",
       detail: systemDetails,
-      qty: calc.invKW > 0 ? `${calc.invKW.toFixed(2)} kW` : "—",
+      qty: calc.invKW > 0 ? `${calc.invKW.toFixed(2)} KW` : "—",
       rate: formatINR(calc.grandTotal),
       discount: "0 %",
       total: formatINR(calc.grandTotal),
@@ -156,7 +156,7 @@ function buildCommercialQuotationData() {
     channelPartnerCode: readText("channelPartnerCode"),
 
     capacity:
-      plantSize || (calc.invKW > 0 ? `${calc.invKW.toFixed(2)} kW` : "—"),
+      calc.invKW > 0 ? `${calc.invKW.toFixed(2)} KW` : plantSize || "—",
 
     companyName: "POWERSHINE ENERGY",
 
