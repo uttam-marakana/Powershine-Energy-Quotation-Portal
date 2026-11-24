@@ -85,7 +85,7 @@ function requireChannelPartnerCode(value) {
 
 function formatCreatedAt(date) {
   const iso = date.toISOString();
-  return `${iso.slice(0, 10)}  ${iso.slice(11, 19)}`;
+  return `${iso.slice(0, 10)} | ${iso.slice(11, 19)}`;
 }
 
 function validateQuotation(value) {
