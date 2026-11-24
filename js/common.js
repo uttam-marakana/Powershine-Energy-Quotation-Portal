@@ -1137,7 +1137,10 @@ async function saveQuotationLog(data) {
       const result = await response.json();
       if (typeof result.error === "string") message = result.error;
     } catch (error) {
-      console.error("Unable to read the quotation logging error response:", error);
+      console.error(
+        "Unable to read the quotation logging error response:",
+        error,
+      );
     }
     throw new Error(message);
   }

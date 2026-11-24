@@ -123,10 +123,7 @@ function validateQuotation(value) {
   if (!customerName || !customerPhone) {
     throw new RequestError(400, "Customer name and phone are required.");
   }
-  const creatorPhone = requirePhone(
-    value.creatorMobile ?? "",
-    "creator phone",
-  );
+  const creatorPhone = requirePhone(value.creatorMobile ?? "", "creator phone");
   const channelPartnerCode = requireChannelPartnerCode(
     value.channelPartnerCode ?? "",
   );
@@ -155,7 +152,9 @@ async function appendQuotationRow(columns) {
   const secret = process.env.GOOGLE_APPS_SCRIPT_SECRET;
 
   if (!endpoint || !secret) {
-    throw new Error("Google Apps Script environment variables are not configured.");
+    throw new Error(
+      "Google Apps Script environment variables are not configured.",
+    );
   }
 
   let endpointUrl;
@@ -238,7 +237,9 @@ module.exports = async function handler(request, response) {
     }
 
     if (typeof body.website === "string" && body.website.trim()) {
-      return sendJson(response, 400, { error: "Quotation could not be saved." });
+      return sendJson(response, 400, {
+        error: "Quotation could not be saved.",
+      });
     }
 
     await appendQuotationRow(validateQuotation(body.quotation));

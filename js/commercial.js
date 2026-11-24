@@ -155,8 +155,7 @@ function buildCommercialQuotationData() {
     creatorMobile: readText("creatorDisplayMobile"),
     channelPartnerCode: readText("channelPartnerCode"),
 
-    capacity:
-      calc.invKW > 0 ? `${calc.invKW.toFixed(2)} KW` : plantSize || "—",
+    capacity: calc.invKW > 0 ? `${calc.invKW.toFixed(2)} KW` : plantSize || "—",
 
     companyName: "POWERSHINE ENERGY",
 

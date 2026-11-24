@@ -12,7 +12,7 @@
   --success: #c84f0d;
   --danger: #c0392b;
   --radius: 12px;
-  --shadow: 0 4px 20px rgba(200, 79, 13, 0.10);
+  --shadow: 0 4px 20px rgba(200, 79, 13, 0.1);
   --shadow-hover: 0 8px 30px rgba(200, 79, 13, 0.18);
 }
 * {
@@ -22,7 +22,11 @@
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -166,7 +170,9 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
-  transition: transform 0.25s, box-shadow 0.25s;
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s;
   border: 1px solid transparent;
 }
 
@@ -177,7 +183,11 @@ body {
 }
 
 .card-header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent-orange) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--accent-orange) 100%
+  );
   color: white;
   padding: 1.5rem;
   text-align: center;
@@ -265,7 +275,11 @@ body {
 }
 
 .form-header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent-orange) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--accent-orange) 100%
+  );
   color: #ffffff;
   border-bottom: 1px solid var(--primary-dark);
   padding: 1.5rem 2rem;
@@ -307,7 +321,9 @@ body {
   border: 1.5px solid var(--border);
   border-radius: 8px;
   font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   background: #fafafa;
 }
 
@@ -318,7 +334,8 @@ body {
   background: white;
 }
 
-.radio-group, .checkbox-group {
+.radio-group,
+.checkbox-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -459,7 +476,10 @@ body {
 
 /* Print / PDF helper */
 @media print {
-  .header, .footer, .form-actions, .no-print {
+  .header,
+  .footer,
+  .form-actions,
+  .no-print {
     display: none !important;
   }
   .form-container {
@@ -653,7 +673,7 @@ body {
 }
 
 .pdf-preview-actions .btn:disabled {
-  opacity: .55;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
